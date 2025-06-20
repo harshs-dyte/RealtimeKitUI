@@ -1040,9 +1040,9 @@ extension MeetingViewController: RtkChatEventListener {
             if  let textMessage = message as? TextMessage {
                 chat = "\(textMessage.displayName): \(textMessage.message)"
             }else {
-                if message.type == RtkMessageType.image {
+                if message.type == ChatMessageType.image {
                     chat = "\(message.displayName): Send you an Image"
-                } else if message.type == RtkMessageType.file {
+                } else if message.type == ChatMessageType.file {
                     chat = "\(message.displayName): Send you an File"
                 }
             }
