@@ -10,7 +10,7 @@ let package = Package(
   dependencies: [
     .package(
       url: "https://github.com/dyte-in/RealtimeKitiOS.git",
-      revision: "83ae7107f4977b8d11348b520ba535ff22fb7e62")
+      revision: "aeb83f855f18d8f601e289d542958755683bcae3")
   ],
   targets: [
     .target(
@@ -18,7 +18,7 @@ let package = Package(
       path: "RealtimeKitUI/",
       dependencies: [
         "RealtimeKit",
-        "DyteWebRTC",
+        "RTKWebRTC",
       ],
       resources: [
         .process("Resources/notification_join.mp3"),

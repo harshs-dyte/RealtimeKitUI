@@ -9,7 +9,7 @@ import UIKit
 import AVKit
 import AVFoundation
 import RealtimeKit
-import DyteWebRTC
+import RTKWebRTC
 
 class SampleBufferVideoCallView: UIView {
     override class var layerClass: AnyClass {
@@ -251,7 +251,7 @@ extension RtkPipController : AVPictureInPictureControllerDelegate {
     }
 }
 
-class RtkPipFrameRender : NSObject, DyteRTCVideoRenderer {
+class RtkPipFrameRender : NSObject, RTKRTCVideoRenderer {
     
     var displayLayer : AVSampleBufferDisplayLayer
     let targetSize: CGSize
@@ -276,7 +276,7 @@ class RtkPipFrameRender : NSObject, DyteRTCVideoRenderer {
     private let synchronizationQueue = DispatchQueue(label: "com.yourapp.synchronizationQueue")
     
     var isReady = true
-    func renderFrame(_ frame: DyteRTCVideoFrame?) {
+    func renderFrame(_ frame: RTKRTCVideoFrame?) {
         guard let frame = frame else {
             print("[DYTE_PIP] Frame passed is nil")
             return
@@ -305,18 +305,18 @@ class RtkPipFrameRender : NSObject, DyteRTCVideoRenderer {
     }
     
     // Helper function to convert RTCVideoFrame to CVPixelBuffer
-    private func frameToPixelBuffer(frame: DyteRTCVideoFrame) -> CVPixelBuffer? {
-        if let buffer = frame.buffer as? DyteRTCCVPixelBuffer {
+    private func frameToPixelBuffer(frame: RTKRTCVideoFrame) -> CVPixelBuffer? {
+        if let buffer = frame.buffer as? RTKRTCCVPixelBuffer {
             return buffer.pixelBuffer
-        }else if let buffer = frame.buffer as? DyteRTCI420Buffer {
+        }else if let buffer = frame.buffer as? RTKRTCI420Buffer {
             return createPixelBuffer(from: buffer, targetSize: self.targetSize)
         }
-        print("[DYTE_PIP] buffer should be of type DyteRTCCVPixelBuffer")
+        print("[DYTE_PIP] buffer should be of type RTKRTCCVPixelBuffer")
         return nil
         
     }
     
-    private func handleRTCVideoFrame(_ frame: DyteRTCVideoFrame) -> CMSampleBuffer? {
+    private func handleRTCVideoFrame(_ frame: RTKRTCVideoFrame) -> CMSampleBuffer? {
         // Example: Convert frame to CVPixelBuffer for further processing
         if let pixelBuffer = frameToPixelBuffer(frame: frame) {
             // Use pixelBuffer as needed
@@ -329,7 +329,7 @@ class RtkPipFrameRender : NSObject, DyteRTCVideoRenderer {
     var pixelBuffer: CVPixelBuffer?
     var pixelBufferKey: String?
     
-    private func createPixelBuffer(from i420Buffer: DyteRTCI420Buffer, targetSize: CGSize) -> CVPixelBuffer? {
+    private func createPixelBuffer(from i420Buffer: RTKRTCI420Buffer, targetSize: CGSize) -> CVPixelBuffer? {
         // Calculate the scale factor based on the target size and the original buffer size
         let widthScaleFactor = targetSize.width / CGFloat(i420Buffer.width)
         let heightScaleFactor = targetSize.height / CGFloat(i420Buffer.height)
