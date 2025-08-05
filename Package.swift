@@ -15,11 +15,11 @@ let package = Package(
   targets: [
     .target(
       name: "RealtimeKitUI",
-      path: "RealtimeKitUI/",
       dependencies: [
         "RealtimeKit",
         "RTKWebRTC",
       ],
+      path: "RealtimeKitUI/",
       resources: [
         .process("Resources/notification_join.mp3"),
         .process("Resources/notification_message.mp3"),
