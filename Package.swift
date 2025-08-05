@@ -16,8 +16,8 @@ let package = Package(
     .target(
       name: "RealtimeKitUI",
       dependencies: [
-        "RealtimeKit",
-        "RTKWebRTC",
+        .product(name: "RealtimeKit", package: "RealtimeKitCoreiOS"),
+        .product(name: "RTKWebRTC", package: "RealtimeKitCoreiOS"),
       ],
       path: "RealtimeKitUI/",
       resources: [
