@@ -9,8 +9,8 @@ let package = Package(
   ],
   dependencies: [
     .package(
-      url: "https://github.com/dyte-in/RealtimeKitCoreiOS.git",
-      revision: "aeb83f855f18d8f601e289d542958755683bcae3")
+      url: "https://github.com/dyte-in/RealtimeKitiOS.git",
+      revision: "5473910f19a62a96c9b7cdd8d9c08f6829f560ea")
   ],
   targets: [
     .target(

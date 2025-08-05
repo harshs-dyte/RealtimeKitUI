@@ -16,21 +16,21 @@ open class BaseTableViewCell: UITableViewCell {
         contentView.addSubview(cellSeparatorBottom)
         contentView.addSubview(cellSeparatorTop)
         cellSeparatorTop.set(.leading(contentView, rtkSharedTokenSpace.space4),
-                          .trailing(contentView),
-                          .height(0.25),
-                          .top(contentView))
+                             .trailing(contentView),
+                             .height(0.25),
+                             .top(contentView))
         cellSeparatorBottom.set(.leading(contentView, rtkSharedTokenSpace.space4),
-                          .trailing(contentView),
-                          .height(0.25),
-                          .bottom(contentView))
-        cellSeparatorTop.backgroundColor =  rtkSharedTokenColor.background.shade600
-        cellSeparatorBottom.backgroundColor =  rtkSharedTokenColor.background.shade600
+                                .trailing(contentView),
+                                .height(0.25),
+                                .bottom(contentView))
+        cellSeparatorTop.backgroundColor = rtkSharedTokenColor.background.shade600
+        cellSeparatorBottom.backgroundColor = rtkSharedTokenColor.background.shade600
         cellSeparatorTop.isHidden = true
         cellSeparatorBottom.isHidden = true
-        
     }
-    
-    required  public init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    public required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }

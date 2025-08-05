@@ -1,5 +1,5 @@
 //
-//  PluginViewController.swift
+//  RtkPluginViewController.swift
 //  RealtimeKitUI
 //
 //  Created by Shaunak Jagtap on 24/01/23.
@@ -10,11 +10,11 @@ import RealtimeKit
 import UIKit
 
 public class RtkPluginViewController: UIViewController {
-    
     // MARK: - Properties
+
     var plugins: [RtkPlugin] = []
     let pluginTableView = UITableView()
-    
+
     public init(plugins: [RtkPlugin]) {
         self.plugins = plugins
         if plugins.count > 0 {
@@ -22,21 +22,23 @@ public class RtkPluginViewController: UIViewController {
         }
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     // MARK: - View Life Cycle
-    public  override func viewDidLoad() {
+
+    override public func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        self.view.accessibilityIdentifier = "Plugins_Screen"
+        view.accessibilityIdentifier = "Plugins_Screen"
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     // MARK: - Setup Views
-   private func setupViews() {
-        
+
+    private func setupViews() {
         // configure messageTableView
         pluginTableView.delegate = self
         pluginTableView.keyboardDismissMode = .onDrag
@@ -44,7 +46,7 @@ public class RtkPluginViewController: UIViewController {
         pluginTableView.register(PluginCell.self, forCellReuseIdentifier: "PluginCell")
         pluginTableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(pluginTableView)
-    
+
         let leftButton: RtkControlBarButton = {
             let button = RtkControlBarButton(image: RtkImage(image: ImageProvider.image(named: "icon_cross")))
             return button
@@ -53,7 +55,7 @@ public class RtkPluginViewController: UIViewController {
         leftButton.addTarget(self, action: #selector(goBack), for: .touchUpInside)
         let customBarButtonItem = UIBarButtonItem(customView: leftButton)
         navigationItem.leftBarButtonItem = customBarButtonItem
-        
+
         let label = RtkUIUtility.createLabel(text: "Plugins")
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.textColor = DesignLibrary.shared.color.textColor.onBackground.shade900
@@ -65,38 +67,37 @@ public class RtkPluginViewController: UIViewController {
             pluginTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             pluginTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -8),
         ]
-        
+
         NSLayoutConstraint.activate(constraints)
     }
-    
-    
+
     // MARK: - Actions
+
     @objc func goBack() {
-        self.dismiss(animated: true)
+        dismiss(animated: true)
     }
 }
 
 extension RtkPluginViewController: UITableViewDelegate, UITableViewDataSource {
-  public  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return plugins.count
+    public func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
+        plugins.count
     }
-    
-    public  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if let cell = tableView.dequeueReusableCell(withIdentifier: "PluginCell", for: indexPath) as? PluginCell
-        {
+
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "PluginCell", for: indexPath) as? PluginCell {
             cell.set(plugin: plugins[indexPath.row], indexPath: indexPath)
             return cell
         }
-        
+
         return UITableViewCell(frame: .zero)
     }
-    
-    public   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+    public func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
         let plugin = plugins[indexPath.row]
         if plugin.isActive {
             plugin.deactivate()
-        }else {
-            plugin.activate() 
+        } else {
+            plugin.activate()
         }
         goBack()
     }

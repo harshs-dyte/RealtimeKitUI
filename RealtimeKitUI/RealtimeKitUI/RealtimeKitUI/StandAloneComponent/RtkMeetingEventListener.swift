@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  RtkMeetingEventListener.swift
 //  RealtimeKitUI
 //
 //  Created by sudhir kumar on 22/02/23.
@@ -7,159 +7,136 @@
 
 import RealtimeKit
 
+class RtkMeetingEventListener {
+    private var selfAudioStateCompletion: ((Bool) -> Void)?
+    private var recordMeetingStartCompletion: ((Bool) -> Void)?
+    private var recordMeetingStopCompletion: ((Bool) -> Void)?
+    private var selfJoinedStateCompletion: ((Bool) -> Void)?
+    private var selfLeaveStateCompletion: ((Bool) -> Void)?
+    private var participantLeaveStateCompletion: ((RtkMeetingParticipant) -> Void)?
+    private var participantJoinStateCompletion: ((RtkMeetingParticipant) -> Void)?
+    private var participantPinnedStateCompletion: ((RtkMeetingParticipant) -> Void)?
+    private var participantUnPinnedStateCompletion: ((RtkMeetingParticipant) -> Void)?
 
-class RtkMeetingEventListener  {
-    
-    private var selfAudioStateCompletion:((Bool)->Void)?
-    private var recordMeetingStartCompletion:((Bool)->Void)?
-    private var recordMeetingStopCompletion:((Bool)->Void)?
-    private var selfJoinedStateCompletion:((Bool)->Void)?
-    private var selfLeaveStateCompletion:((Bool)->Void)?
-    private var participantLeaveStateCompletion:((RtkMeetingParticipant)->Void)?
-    private var participantJoinStateCompletion:((RtkMeetingParticipant)->Void)?
-    private var participantPinnedStateCompletion:((RtkMeetingParticipant)->Void)?
-    private var participantUnPinnedStateCompletion:((RtkMeetingParticipant)->Void)?
-    
     var rtkClient: RealtimeKitClient
-    
+
     init(rtkClient: RealtimeKitClient) {
         self.rtkClient = rtkClient
         self.rtkClient.addRecordingEventListener(recordingEventListener: self)
         self.rtkClient.addParticipantsEventListener(participantsEventListener: self)
     }
-    
+
     func clean() {
-        self.rtkClient.removeParticipantsEventListener(participantsEventListener: self)
-        self.rtkClient.removeRecordingEventListener(recordingEventListener: self)
+        rtkClient.removeParticipantsEventListener(participantsEventListener: self)
+        rtkClient.removeRecordingEventListener(recordingEventListener: self)
     }
-    
+
     private let isDebugModeOn = RealtimeKitUI.isDebugModeOn
-    
-    public func startRecordMeeting(completion:@escaping (_ success: Bool) -> Void) {
-        self.recordMeetingStartCompletion = completion
-        self.rtkClient.recording.start { _ in }
+
+    func startRecordMeeting(completion: @escaping (_ success: Bool) -> Void) {
+        recordMeetingStartCompletion = completion
+        rtkClient.recording.start { _ in }
     }
-    
-    public func stopRecordMeeting(completion:@escaping (_ success: Bool) -> Void) {
-        self.recordMeetingStopCompletion = completion
-        self.rtkClient.recording.stop { _ in }
+
+    func stopRecordMeeting(completion: @escaping (_ success: Bool) -> Void) {
+        recordMeetingStopCompletion = completion
+        rtkClient.recording.stop { _ in }
     }
-    
-    
-    public func joinMeeting(completion:@escaping (_ success: Bool) -> Void) {
-        self.selfJoinedStateCompletion = completion
-        self.rtkClient.joinRoom(onSuccess: {}, onFailure: {_ in})
+
+    func joinMeeting(completion: @escaping (_ success: Bool) -> Void) {
+        selfJoinedStateCompletion = completion
+        rtkClient.joinRoom(onSuccess: {}, onFailure: { _ in })
     }
-    
-    public func leaveMeeting(completion:@escaping(_ success: Bool)->Void) {
-        self.selfLeaveStateCompletion = completion
-        self.rtkClient.leaveRoom(onSuccess: {}, onFailure: {_ in})
+
+    func leaveMeeting(completion: @escaping (_ success: Bool) -> Void) {
+        selfLeaveStateCompletion = completion
+        rtkClient.leaveRoom(onSuccess: {}, onFailure: { _ in })
     }
-    
-    
-    public func observeParticipantJoin(update:@escaping(_ participant: RtkMeetingParticipant)->Void) {
+
+    func observeParticipantJoin(update: @escaping (_ participant: RtkMeetingParticipant) -> Void) {
         participantJoinStateCompletion = update
     }
-    
-    public func observeParticipantLeave(update:@escaping(_ participant: RtkMeetingParticipant)->Void) {
+
+    func observeParticipantLeave(update: @escaping (_ participant: RtkMeetingParticipant) -> Void) {
         participantLeaveStateCompletion = update
     }
-    
-    public func observeParticipantPinned(update:@escaping(_ participant: RtkMeetingParticipant)->Void) {
+
+    func observeParticipantPinned(update: @escaping (_ participant: RtkMeetingParticipant) -> Void) {
         participantPinnedStateCompletion = update
     }
-    
-    public func observeParticipantUnPinned(update:@escaping(_ participant: RtkMeetingParticipant)->Void) {
+
+    func observeParticipantUnPinned(update: @escaping (_ participant: RtkMeetingParticipant) -> Void) {
         participantUnPinnedStateCompletion = update
     }
-    
-    deinit{
+
+    deinit {
         print("RtkMeetingEventListener deallocing")
     }
 }
 
 extension RtkMeetingEventListener: RtkRecordingEventListener {
     func onRecordingStateChanged(oldState: RecordingState, newState: RecordingState) {
-        if(oldState != newState){
+        if oldState != newState {
             switch newState {
-            case .idle: if oldState == .stopping{
-                onMeetingRecordingEnded()
-            }
+            case .idle: if oldState == .stopping {
+                    onMeetingRecordingEnded()
+                }
             case .recording: if oldState == .starting {
-                onMeetingRecordingStarted()
-            }
+                    onMeetingRecordingStarted()
+                }
             default:
                 break
             }
         }
     }
-    
+
     func onMeetingRecordingEnded() {
-        self.recordMeetingStopCompletion?(true)
-        self.recordMeetingStopCompletion = nil
+        recordMeetingStopCompletion?(true)
+        recordMeetingStopCompletion = nil
     }
-    
+
     func onMeetingRecordingStarted() {
-        self.recordMeetingStartCompletion?(true)
-        self.recordMeetingStartCompletion = nil
+        recordMeetingStartCompletion?(true)
+        recordMeetingStartCompletion = nil
     }
 }
 
 extension RtkMeetingEventListener: RtkParticipantsEventListener {
-    func onActiveParticipantsChanged(active: [RtkRemoteParticipant]) {
-        
-    }
-    
-    func onActiveSpeakerChanged(participant: RtkRemoteParticipant?) {
-        
-    }
-    
-    func onAllParticipantsUpdated(allParticipants: [RtkParticipant]) {
-        
-    }
-    
-    func onAudioUpdate(participant: RtkRemoteParticipant, isEnabled: Bool) {
-        
-    }
-    
-    func onNewBroadcastMessage(type: String, payload: [String : Any]) {
-        
-    }
-    
-    func onScreenShareUpdate(participant: RtkRemoteParticipant, isEnabled: Bool) {
-        
-    }
-    
-    func onUpdate(participants: RtkParticipants) {
-        
-    }
-    
-    func onVideoUpdate(participant: RtkRemoteParticipant, isEnabled: Bool) {
-        
-    }
-    
-    
+    func onActiveParticipantsChanged(active _: [RtkRemoteParticipant]) {}
+
+    func onActiveSpeakerChanged(participant _: RtkRemoteParticipant?) {}
+
+    func onAllParticipantsUpdated(allParticipants _: [RtkParticipant]) {}
+
+    func onAudioUpdate(participant _: RtkRemoteParticipant, isEnabled _: Bool) {}
+
+    func onNewBroadcastMessage(type _: String, payload _: [String: Any]) {}
+
+    func onScreenShareUpdate(participant _: RtkRemoteParticipant, isEnabled _: Bool) {}
+
+    func onUpdate(participants _: RtkParticipants) {}
+
+    func onVideoUpdate(participant _: RtkRemoteParticipant, isEnabled _: Bool) {}
+
     func onParticipantPinned(participant: RtkRemoteParticipant) {
-        self.participantPinnedStateCompletion?(participant)
+        participantPinnedStateCompletion?(participant)
     }
-    
+
     func onParticipantUnpinned(participant: RtkRemoteParticipant) {
-        self.participantUnPinnedStateCompletion?(participant)
+        participantUnPinnedStateCompletion?(participant)
     }
-    
+
     func onParticipantJoin(participant: RtkRemoteParticipant) {
         if isDebugModeOn {
-            print("Debug RtkUIKit | Delegate onParticipantJoin \(participant.audioEnabled) \(participant.name) totalCount \(self.rtkClient.participants.joined) participants")
+            print("Debug RtkUIKit | Delegate onParticipantJoin \(participant.audioEnabled) \(participant.name) totalCount \(rtkClient.participants.joined) participants")
         }
-        self.participantJoinStateCompletion?(participant)
+        participantJoinStateCompletion?(participant)
     }
-    
+
     func onParticipantLeave(participant: RtkRemoteParticipant) {
         if isDebugModeOn {
-            print("Debug RtkUIKit | Delegate onParticipantLeave \(self.rtkClient.participants.active.count)")
+            print("Debug RtkUIKit | Delegate onParticipantLeave \(rtkClient.participants.active.count)")
         }
-        self.participantLeaveStateCompletion?(participant)
+        participantLeaveStateCompletion?(participant)
     }
-    
 }
-

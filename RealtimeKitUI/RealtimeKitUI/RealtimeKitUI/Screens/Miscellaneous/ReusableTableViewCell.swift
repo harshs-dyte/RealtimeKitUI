@@ -7,118 +7,113 @@
 
 import UIKit
 
-
-
 class TitleTableViewCell: BaseTableViewCell {
     let lblTitle = {
         let lblTitle = RtkUIUtility.createLabel()
         return lblTitle
     }()
-    
+
     private var viewModel: TitleTableViewCellModel?
-    
+
     func createSubView(on baseView: UIView) {
         baseView.addSubview(lblTitle)
         lblTitle.set(.fillSuperView(baseView))
     }
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
     }
-    
+
     func setupView() {
         let baseView = UIView()
         createSubView(on: baseView)
         contentView.addSubview(baseView)
-        baseView.set(.below(self.cellSeparatorTop, rtkSharedTokenSpace.space5),
+        baseView.set(.below(cellSeparatorTop, rtkSharedTokenSpace.space5),
                      .above(cellSeparatorBottom, rtkSharedTokenSpace.space5),
-                     .sameLeadingTrailing(contentView,rtkSharedTokenSpace.space4))
-      
+                     .sameLeadingTrailing(contentView, rtkSharedTokenSpace.space4))
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
 struct TitleTableViewCellModel: BaseModel {
     var title: String
-    func clean() {
-        
-    }
+    func clean() {}
 }
 
 extension TitleTableViewCell: ConfigureView {
     var model: TitleTableViewCellModel {
-        if let model =  viewModel {
+        if let model = viewModel {
             return model
         }
         fatalError("Before calling this , Please set model first using 'func configure(model: TitleTableViewCellModel)'")
     }
-    
+
     func configure(model: TitleTableViewCellModel) {
         viewModel = model
-        self.lblTitle.text = model.title
+        lblTitle.text = model.title
     }
 }
 
 class AcceptButtonTableViewCell: ButtonTableViewCell {
-    
     override func setupView() {
         super.setupView()
-        self.button.backgroundColor = rtkSharedTokenColor.background.shade800
+        button.backgroundColor = rtkSharedTokenColor.background.shade800
     }
 }
-class AcceptButtonJoinStageRequestTableViewCell: AcceptButtonTableViewCell {
-}
 
-class AcceptButtonWaitingTableViewCell: AcceptButtonTableViewCell {
-}
+class AcceptButtonJoinStageRequestTableViewCell: AcceptButtonTableViewCell {}
+
+class AcceptButtonWaitingTableViewCell: AcceptButtonTableViewCell {}
 
 class RejectButtonTableViewCell: ButtonTableViewCell {
-    
     override func setupView() {
         super.setupView()
-        self.button.backgroundColor = rtkSharedTokenColor.background.shade800
+        button.backgroundColor = rtkSharedTokenColor.background.shade800
     }
 }
-class RejectButtonJoinStageRequestTableViewCell: RejectButtonTableViewCell {
-}
+
+class RejectButtonJoinStageRequestTableViewCell: RejectButtonTableViewCell {}
 
 class ButtonTableViewCell: BaseTableViewCell {
-    
     let button = {
         let button = RtkButton()
         return button
     }()
-    
-    var buttonClick:((RtkButton) -> Void)?
+
+    var buttonClick: ((RtkButton) -> Void)?
     private var viewModel: ButtonTableViewCellModel?
 
     func createSubView(on baseView: UIView) {
         baseView.addSubview(button)
         button.set(.fillSuperView(baseView))
     }
-    
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
     }
-    
+
     func setupView() {
         let baseView = UIView()
         createSubView(on: baseView)
         contentView.addSubview(baseView)
-        baseView.set(.below(self.cellSeparatorTop, rtkSharedTokenSpace.space2),
+        baseView.set(.below(cellSeparatorTop, rtkSharedTokenSpace.space2),
                      .above(cellSeparatorBottom, rtkSharedTokenSpace.space2),
                      .sameLeadingTrailing(cellSeparatorBottom))
         button.addTarget(self, action: #selector(buttonClick(button:)), for: .touchUpInside)
     }
-    
-   @objc func buttonClick(button: RtkButton) {
-       self.buttonClick?(button)
+
+    @objc func buttonClick(button: RtkButton) {
+        buttonClick?(button)
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
@@ -126,32 +121,27 @@ class ButtonTableViewCell: BaseTableViewCell {
 struct ButtonTableViewCellModel: BaseModel {
     var buttonTitle: String
     var titleColor: UIColor = rtkSharedTokenColor.status.success
-    func clean() {
-        
-    }
+    func clean() {}
 }
 
 extension ButtonTableViewCell: ConfigureView {
     var model: ButtonTableViewCellModel {
-        if let model =  viewModel {
+        if let model = viewModel {
             return model
         }
         fatalError("Before calling this , Please set model first using 'func configure(model: TitleTableViewCellModel)'")
     }
-    
+
     func configure(model: ButtonTableViewCellModel) {
         viewModel = model
-        self.button.setTitle(model.buttonTitle, for: .normal)
-        self.button.setTitleColor(model.titleColor, for: .normal)
+        button.setTitle(model.buttonTitle, for: .normal)
+        button.setTitleColor(model.titleColor, for: .normal)
     }
 }
 
-
 struct SearchTableViewCellModel: BaseModel {
     var placeHolder: String
-    func clean() {
-        
-    }
+    func clean() {}
 }
 
 class SearchTableViewCell: BaseTableViewCell {
@@ -162,43 +152,44 @@ class SearchTableViewCell: BaseTableViewCell {
         searchBar.isUserInteractionEnabled = false
         return searchBar
     }()
+
     private var viewModel: SearchTableViewCellModel?
 
-    
     func createSubView(on baseView: UIView) {
         baseView.addSubview(searchBar)
         searchBar.set(.fillSuperView(baseView))
     }
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
     }
-    
+
     func setupView() {
         let baseView = UIView()
         createSubView(on: baseView)
         contentView.addSubview(baseView)
-        baseView.set(.below(self.cellSeparatorTop, rtkSharedTokenSpace.space2),
+        baseView.set(.below(cellSeparatorTop, rtkSharedTokenSpace.space2),
                      .above(cellSeparatorBottom, rtkSharedTokenSpace.space2),
-                     .sameLeadingTrailing(contentView,rtkSharedTokenSpace.space4))
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+                     .sameLeadingTrailing(contentView, rtkSharedTokenSpace.space4))
     }
 
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 extension SearchTableViewCell: ConfigureView {
     var model: SearchTableViewCellModel {
-        if let model =  viewModel {
+        if let model = viewModel {
             return model
         }
         fatalError("Before calling this , Please set model first using 'func configure(model: TitleTableViewCellModel)'")
     }
-    
+
     func configure(model: SearchTableViewCellModel) {
         viewModel = model
-        self.searchBar.placeholder = model.placeHolder
+        searchBar.placeholder = model.placeHolder
     }
 }

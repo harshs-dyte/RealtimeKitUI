@@ -8,8 +8,7 @@
 import UIKit
 
 public struct SpaceToken {
-
-    public let space0: CGFloat 
+    public let space0: CGFloat
     public let space1: CGFloat
     public let space2: CGFloat
     public let space3: CGFloat

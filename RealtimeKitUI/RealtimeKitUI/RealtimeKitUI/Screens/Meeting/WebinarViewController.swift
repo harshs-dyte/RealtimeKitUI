@@ -5,8 +5,8 @@
 //  Created by sudhir kumar on 17/04/23.
 //
 
-import UIKit
 import RealtimeKit
+import UIKit
 
 public enum WebinarStageStatus {
     case canJoinStage
@@ -20,58 +20,58 @@ public enum WebinarStageStatus {
 }
 
 public class WebinarViewController: MeetingViewController {
-    private var waitingView : WaitingRoomView?
-    var webinarViewModel : WebinarViewModel?
-    
-    public override func viewDidLoad() {
+    private var waitingView: WaitingRoomView?
+    var webinarViewModel: WebinarViewModel?
+
+    override public func viewDidLoad() {
         super.viewDidLoad()
         webinarViewModel = WebinarViewModel(rtkClient: meeting)
         webinarViewModel?.stageDelegate = self
     }
-    
+
     func createWaitingView(message: String) -> WaitingRoomView {
         let waitingView = WaitingRoomView(automaticClose: false, onCompletion: {})
-        waitingView.backgroundColor = self.view.backgroundColor
-        self.gridBaseView.addSubview(waitingView)
-        waitingView.set(.fillSuperView(self.gridBaseView))
+        waitingView.backgroundColor = view.backgroundColor
+        gridBaseView.addSubview(waitingView)
+        waitingView.set(.fillSuperView(gridBaseView))
         waitingView.button.isHidden = true
         waitingView.show(message: message)
         return waitingView
     }
-    
-    public override func refreshMeetingGrid(forRotation: Bool = false) {
+
+    override public func refreshMeetingGrid(forRotation: Bool = false) {
         super.refreshMeetingGrid(forRotation: forRotation)
-        self.waitingView?.removeFromSuperview()
+        waitingView?.removeFromSuperview()
         let mediaPermission = meeting.localUser.permissions.media
-        
-        if (mediaPermission.audioPermission == MediaPermission.allowed || mediaPermission.video.permission == MediaPermission.allowed) && meeting.participants.active.isEmpty && StageStatus.getStageStatus(rtkClient: meeting) == .canJoinStage {
-            self.waitingView = createWaitingView(message: "The stage is empty.\nYou are off stage. You can manage stage request from the participants tab.")
-        } else if meeting.participants.active.isEmpty && meeting.localUser.stageStatus != .onStage {
-            self.waitingView = createWaitingView(message: "Webinar has not yet been started")
+
+        if mediaPermission.audioPermission == MediaPermission.allowed || mediaPermission.video.permission == MediaPermission.allowed, meeting.participants.active.isEmpty, StageStatus.getStageStatus(rtkClient: meeting) == .canJoinStage {
+            waitingView = createWaitingView(message: "The stage is empty.\nYou are off stage. You can manage stage request from the participants tab.")
+        } else if meeting.participants.active.isEmpty, meeting.localUser.stageStatus != .onStage {
+            waitingView = createWaitingView(message: "Webinar has not yet been started")
         }
     }
-    
+
     override func getBottomBar() -> RtkControlBar {
-        return getTabBar()
+        getTabBar()
     }
-    
+
     func getTabBar() -> RtkControlBar {
-        let controlBar = RtkWebinarControlBar(meeting: self.meeting, delegate: nil, dataSource: nil, presentingViewController: self) { button in
+        let controlBar = RtkWebinarControlBar(meeting: meeting, delegate: nil, dataSource: nil, presentingViewController: self) { _ in
         } settingViewControllerCompletion: {
             [weak self] in
-            guard let self = self else {return}
-            self.refreshMeetingGridTile(participant: self.meeting.localUser)
+            guard let self else { return }
+            refreshMeetingGridTile(participant: meeting.localUser)
         } onLeaveMeetingCompletion: {
             [weak self] in
-            guard let self = self else {return}
-            self.viewModel.clean()
-            self.onFinishedMeeting()
+            guard let self else { return }
+            viewModel.clean()
+            onFinishedMeeting()
         }
         return controlBar
     }
-    
+
     func updateNotificationWithToast(message: String) {
-        self.view.showToast(toastMessage: message, duration: 2.0, uiBlocker: false)
+        view.showToast(toastMessage: message, duration: 2.0, uiBlocker: false)
         updateMoreButtonNotificationBubble()
         NotificationCenter.default.post(name: Notification.Name("Notify_ParticipantListUpdate"), object: nil, userInfo: nil)
     }
@@ -81,9 +81,8 @@ extension WebinarViewController: RtkStageDelegate {
     func onPresentRequestAdded(participant: RtkRemoteParticipant) {
         updateNotificationWithToast(message: "\(participant.name) has requested to join stage")
     }
-    
+
     func onPresentRequestWithdrawn(participant: RtkRemoteParticipant) {
         updateNotificationWithToast(message: "\(participant.name) has cancelled to join stage")
     }
 }
-

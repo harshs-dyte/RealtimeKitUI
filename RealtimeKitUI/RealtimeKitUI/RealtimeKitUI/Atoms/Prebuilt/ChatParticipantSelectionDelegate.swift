@@ -1,25 +1,25 @@
-import UIKit
 import RealtimeKit
+import UIKit
 
 protocol ChatParticipantSelectionDelegate: AnyObject {
     func didSelectChat(withParticipant participant: RtkRemoteParticipant?)
 }
 
 class ChatParticipantSelectionViewController: UIViewController, SetTopbar {
-    public var shouldShowTopBar: Bool = true
-    public var topBar: RtkNavigationBar = RtkNavigationBar(title: "Chat with...")
+    var shouldShowTopBar: Bool = true
+    var topBar: RtkNavigationBar = .init(title: "Chat with...")
     weak var delegate: ChatParticipantSelectionDelegate?
     private var participants = [RtkRemoteParticipant]()
     private var filteredParticipants = [RtkRemoteParticipant]()
     var selectedParticipant: RtkRemoteParticipant?
-    
+
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.placeholder = "Search participants"
         searchBar.delegate = self
         return searchBar
     }()
-    
+
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.delegate = self
@@ -27,40 +27,39 @@ class ChatParticipantSelectionViewController: UIViewController, SetTopbar {
         tableView.backgroundColor = DesignLibrary.shared.color.background.shade1000
         return tableView
     }()
-    
+
     func setParticipants(participants: [RtkRemoteParticipant]) {
         self.participants = participants
-        self.filteredParticipants = participants
+        filteredParticipants = participants
     }
-    
-    func newChatReceived(message: ChatMessage) {
-        self.tableView.reloadData()
+
+    func newChatReceived(message _: ChatMessage) {
+        tableView.reloadData()
     }
-    
+
     func onRemove(userId: String) {
         Shared.data.privateChatReadLookup.removeValue(forKey: userId)
-        self.tableView.reloadData()
+        tableView.reloadData()
     }
-    
+
     func onParticipantJoin(userId: String) {
         Shared.data.privateChatReadLookup[userId] = false
-        self.tableView.reloadData()
+        tableView.reloadData()
     }
-    
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         filteredParticipants = participants
     }
-    
-    public override func viewSafeAreaInsetsDidChange() {
+
+    override func viewSafeAreaInsetsDidChange() {
         super.viewSafeAreaInsetsDidChange()
-        topBar.get(.top)?.constant = self.view.safeAreaInsets.top
+        topBar.get(.top)?.constant = view.safeAreaInsets.top
     }
-    
+
     private func setupViews() {
-        self.addTopBar(dismissAnimation: true)
+        addTopBar(dismissAnimation: true)
         topBar.backgroundColor = tableView.backgroundColor
         topBar.leftButton.backgroundColor = tableView.backgroundColor
         tableView.register(ParticipantInCallTableViewCell.self, forCellReuseIdentifier: "ParticipantInCallTableViewCell")
@@ -68,36 +67,34 @@ class ChatParticipantSelectionViewController: UIViewController, SetTopbar {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(searchBar)
         view.addSubview(tableView)
-        
+
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: topBar.bottomAnchor),
             searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            
+
             tableView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
 }
 
 extension ChatParticipantSelectionViewController: UITableViewDelegate, UITableViewDataSource {
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+    func numberOfSections(in _: UITableView) -> Int {
+        2
     }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+
+    func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
-            return 1
+            1
         } else {
-            return filteredParticipants.count
+            filteredParticipants.count
         }
     }
-    
+
     private func setNotificationBadge(show: Bool, cell: ParticipantInCallTableViewCell) {
-        
         if cell.notificationBadge == nil {
             var notificationBadge = RtkNotificationBadgeView()
             cell.addSubview(notificationBadge)
@@ -105,25 +102,24 @@ extension ChatParticipantSelectionViewController: UITableViewDelegate, UITableVi
             notificationBadge.set(.centerY(cell.moreButton),
                                   .before(cell.moreButton, notificationBadgeHeight),
                                   .height(notificationBadgeHeight),
-                                  .width(notificationBadgeHeight*2.5, .lessThanOrEqual))
-            
-            notificationBadge.layer.cornerRadius = notificationBadgeHeight/2.0
+                                  .width(notificationBadgeHeight * 2.5, .lessThanOrEqual))
+
+            notificationBadge.layer.cornerRadius = notificationBadgeHeight / 2.0
             notificationBadge.layer.masksToBounds = true
             notificationBadge.backgroundColor = rtkSharedTokenColor.brand.shade500
             cell.notificationBadge = notificationBadge
-            
         }
         cell.notificationBadge!.isHidden = !show
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ParticipantInCallTableViewCell", for: indexPath) as! ParticipantInCallTableViewCell
         cell.selectionStyle = .none
-        
+
         if indexPath.section == 0 {
             cell.audioButton.isHidden = true
             cell.videoButton.isHidden = true
-            
+
             cell.backgroundColor = selectedParticipant == nil ? DesignLibrary.shared.color.background.shade900 : tableView.backgroundColor
             cell.moreButton.setImage(ImageProvider.image(named: "icon_right_arrow"), for: .normal)
             cell.moreButton.backgroundColor = cell.backgroundColor
@@ -135,7 +131,7 @@ extension ChatParticipantSelectionViewController: UITableViewDelegate, UITableVi
             setNotificationBadge(show: Shared.data.privateChatReadLookup["everyone"] ?? false, cell: cell)
         } else {
             cell.backgroundColor = filteredParticipants[indexPath.row].userId == selectedParticipant?.userId ? DesignLibrary.shared.color.background.shade900 : tableView.backgroundColor
-            
+
             let participant = filteredParticipants[indexPath.row]
             cell.profileAvatarView.set(participant: participant)
             cell.moreButton.backgroundColor = cell.backgroundColor
@@ -152,22 +148,21 @@ extension ChatParticipantSelectionViewController: UITableViewDelegate, UITableVi
                 setNotificationBadge(show: show, cell: cell)
             }
         }
-        
+
         return cell
     }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+    func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
             delegate?.didSelectChat(withParticipant: nil)
         } else {
             delegate?.didSelectChat(withParticipant: filteredParticipants[indexPath.row])
         }
-        
     }
 }
 
 extension ChatParticipantSelectionViewController: UISearchBarDelegate {
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+    func searchBar(_: UISearchBar, textDidChange searchText: String) {
         let searchText = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         if searchText.isEmpty {
             filteredParticipants = participants

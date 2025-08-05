@@ -1,5 +1,5 @@
 //
-//  ScreenShareTabButton.swift
+//  RtkPluginScreenShareTabButton.swift
 //  RealtimeKitUI
 //
 //  Created by sudhir kumar on 03/01/23.
@@ -7,57 +7,57 @@
 
 import UIKit
 
-
 public class NextPreviousButtonView: UIView {
-    public  let previousButton: RtkControlBarButton
-    public  let nextButton: RtkControlBarButton
+    public let previousButton: RtkControlBarButton
+    public let nextButton: RtkControlBarButton
     private let firstLabel: RtkLabel
     private let secondLabel: RtkLabel
     private let slashLabel: RtkLabel
-    
+
     private let tokenBorderRadius = DesignLibrary.shared.borderRadius
     private let tokenSpace = DesignLibrary.shared.space
     private let tokenColor = DesignLibrary.shared.color
     private let tokenTextColorToken = DesignLibrary.shared.color.textColor
 
     private let borderRadiusType: BorderRadiusToken.RadiusType = AppTheme.shared.cornerRadiusTypePaginationView ?? .extrarounded
-   
+
     public var autolayoutModeEnable = true
-    
+
     let autoLayoutImageView: BaseImageView = {
         let imageView = RtkUIUtility.createImageView(image: RtkImage(image: ImageProvider.image(named: "icon_topbar_autolayout")))
         return imageView
     }()
-    
-   convenience init() {
-       self.init(firsButtonImage: RtkImage(image: ImageProvider.image(named: "icon_left_arrow")), secondButtonImage: RtkImage(image: ImageProvider.image(named: "icon_right_arrow")))
+
+    convenience init() {
+        self.init(firsButtonImage: RtkImage(image: ImageProvider.image(named: "icon_left_arrow")), secondButtonImage: RtkImage(image: ImageProvider.image(named: "icon_right_arrow")))
     }
-    
+
     init(firsButtonImage: RtkImage, secondButtonImage: RtkImage) {
-        self.previousButton = RtkControlBarButton(image: firsButtonImage, appearance: AppTheme.shared.controlBarButtonAppearance)
-        self.nextButton = RtkControlBarButton(image: secondButtonImage, appearance: AppTheme.shared.controlBarButtonAppearance)
-        self.firstLabel = RtkUIUtility.createLabel()
-        self.firstLabel.font = UIFont.systemFont(ofSize: 16)
-        self.firstLabel.textColor = tokenTextColorToken.onBackground.shade900
-        self.slashLabel = RtkUIUtility.createLabel(text: "/")
-        self.slashLabel.font = UIFont.systemFont(ofSize: 16)
-        self.slashLabel.textColor = tokenTextColorToken.onBackground.shade600
-        self.secondLabel = RtkUIUtility.createLabel()
-        self.secondLabel.font = UIFont.systemFont(ofSize: 12)
-        self.secondLabel.textColor = tokenTextColorToken.onBackground.shade600
+        previousButton = RtkControlBarButton(image: firsButtonImage, appearance: AppTheme.shared.controlBarButtonAppearance)
+        nextButton = RtkControlBarButton(image: secondButtonImage, appearance: AppTheme.shared.controlBarButtonAppearance)
+        firstLabel = RtkUIUtility.createLabel()
+        firstLabel.font = UIFont.systemFont(ofSize: 16)
+        firstLabel.textColor = tokenTextColorToken.onBackground.shade900
+        slashLabel = RtkUIUtility.createLabel(text: "/")
+        slashLabel.font = UIFont.systemFont(ofSize: 16)
+        slashLabel.textColor = tokenTextColorToken.onBackground.shade600
+        secondLabel = RtkUIUtility.createLabel()
+        secondLabel.font = UIFont.systemFont(ofSize: 12)
+        secondLabel.textColor = tokenTextColorToken.onBackground.shade600
         super.init(frame: .zero)
         createView()
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func createView() {
         let stackView = RtkUIUtility.createStackView(axis: .horizontal, spacing: 0)
-        self.addSubview(stackView)
+        addSubview(stackView)
         stackView.set(.fillSuperView(self))
-        
+
         let buttonBaseViewPrevious = UIView()
         buttonBaseViewPrevious.addSubview(previousButton)
         previousButton.set(.sameTopBottom(buttonBaseViewPrevious),
@@ -66,13 +66,13 @@ public class NextPreviousButtonView: UIView {
         let buttonBaseViewNext = UIView()
         buttonBaseViewNext.addSubview(nextButton)
         nextButton.set(.sameTopBottom(buttonBaseViewNext),
-                           .trailing(buttonBaseViewNext),
-                           .leading(buttonBaseViewNext))
+                       .trailing(buttonBaseViewNext),
+                       .leading(buttonBaseViewNext))
         let titleBaseView = UIView()
         titleBaseView.addSubview(firstLabel)
         titleBaseView.addSubview(slashLabel)
         titleBaseView.addSubview(secondLabel)
-        
+
         firstLabel.set(.sameTopBottom(titleBaseView),
                        .leading(titleBaseView))
         slashLabel.set(.sameTopBottom(titleBaseView),
@@ -82,31 +82,29 @@ public class NextPreviousButtonView: UIView {
                         .trailing(titleBaseView))
         titleBaseView.addSubview(autoLayoutImageView)
         autoLayoutImageView.set(.fillSuperView(titleBaseView))
-        
-        stackView.addArrangedSubviews(buttonBaseViewPrevious,titleBaseView,buttonBaseViewNext)
-        self.backgroundColor = tokenColor.background.shade900
-        autoLayoutImageView.backgroundColor = self.backgroundColor
-        self.layer.masksToBounds = true
-        self.layer.cornerRadius = tokenBorderRadius.getRadius(size: .two, radius: borderRadiusType)
 
+        stackView.addArrangedSubviews(buttonBaseViewPrevious, titleBaseView, buttonBaseViewNext)
+        backgroundColor = tokenColor.background.shade900
+        autoLayoutImageView.backgroundColor = backgroundColor
+        layer.masksToBounds = true
+        layer.cornerRadius = tokenBorderRadius.getRadius(size: .two, radius: borderRadiusType)
     }
-    
+
     func setText(first: String, second: String) {
-        self.firstLabel.text = first
-        self.secondLabel.text = second
+        firstLabel.text = first
+        secondLabel.text = second
     }
 }
 
 public protocol PluginScreenShareTabButtonDesignDependency: BaseAppearance {
-    var selectedStateBackGroundColor:  TextColorToken.Brand.Shade {get}
-    var normalStateBackGroundColor: TextColorToken.Background.Shade {get}
-    var cornerRadius: BorderRadiusToken.RadiusType {get}
-    var titleColor: TextColorToken.Background.Shade {get}
-    var acitivityInidicatorColor: TextColorToken.Background.Shade {get}
+    var selectedStateBackGroundColor: TextColorToken.Brand.Shade { get }
+    var normalStateBackGroundColor: TextColorToken.Background.Shade { get }
+    var cornerRadius: BorderRadiusToken.RadiusType { get }
+    var titleColor: TextColorToken.Background.Shade { get }
+    var acitivityInidicatorColor: TextColorToken.Background.Shade { get }
 }
 
-
-public class PluginScreenShareTabButtonDesignDependencyModel : PluginScreenShareTabButtonDesignDependency {
+public class PluginScreenShareTabButtonDesignDependencyModel: PluginScreenShareTabButtonDesignDependency {
     public var desingLibrary: RtkDesignTokens
     public var selectedStateBackGroundColor: TextColorToken.Brand.Shade
     public var normalStateBackGroundColor: TextColorToken.Background.Shade
@@ -115,18 +113,15 @@ public class PluginScreenShareTabButtonDesignDependencyModel : PluginScreenShare
     public var acitivityInidicatorColor: TextColorToken.Background.Shade
 
     public required init(designLibrary: RtkDesignTokens = DesignLibrary.shared) {
-        self.desingLibrary = designLibrary
+        desingLibrary = designLibrary
         selectedStateBackGroundColor = designLibrary.color.textColor.onBrand.shade500
         normalStateBackGroundColor = designLibrary.color.textColor.onBackground.shade700
         titleColor = designLibrary.color.textColor.onBackground.shade900
         acitivityInidicatorColor = designLibrary.color.textColor.onBackground.shade900
     }
-   
 }
 
-
 public class RtkPluginScreenShareTabButton: UIButton {
-    
     private var normalImage: RtkImage?
     fileprivate var normalTitle: String
     private var selectedImage: RtkImage?
@@ -135,134 +130,133 @@ public class RtkPluginScreenShareTabButton: UIButton {
     fileprivate var btnTitle: RtkLabel?
     private var baseActivityIndicatorView: BaseIndicatorView?
     fileprivate let appearance: PluginScreenShareTabButtonDesignDependency
-   
+
     public var index: Int = 0
     public let id: String
     public var btnImageView: BaseImageView?
 
     public init(image: RtkImage?, title: String = "", id: String = "", appearance: PluginScreenShareTabButtonDesignDependency = PluginScreenShareTabButtonDesignDependencyModel()) {
-        self.normalImage = image
+        normalImage = image
         self.id = id
         self.appearance = appearance
-        self.normalTitle = title
+        normalTitle = title
         super.init(frame: .zero)
-        self.layer.cornerRadius = appearance.desingLibrary.borderRadius.getRadius(size: .one, radius: appearance.cornerRadius)
+        layer.cornerRadius = appearance.desingLibrary.borderRadius.getRadius(size: .one, radius: appearance.cornerRadius)
         createButton()
-        self.backgroundColor = appearance.normalStateBackGroundColor
-        self.clipsToBounds = true
+        backgroundColor = appearance.normalStateBackGroundColor
+        clipsToBounds = true
     }
-    
-    public override var isSelected: Bool {
+
+    override public var isSelected: Bool {
         didSet {
             if isSelected == true {
-                if let image = self.selectedImage {
-                    self.btnImageView?.setImage(image: image)
+                if let image = selectedImage {
+                    btnImageView?.setImage(image: image)
                 }
-                if let title = self.selectedTitle {
-                    self.btnTitle?.setTextWhenInsideStackView(text: title)
+                if let title = selectedTitle {
+                    btnTitle?.setTextWhenInsideStackView(text: title)
                 }
-                self.backgroundColor = appearance.selectedStateBackGroundColor
-            }else {
-                if let image = self.normalImage {
-                    self.btnImageView?.setImage(image: image)
+                backgroundColor = appearance.selectedStateBackGroundColor
+            } else {
+                if let image = normalImage {
+                    btnImageView?.setImage(image: image)
                 }
-                self.btnTitle?.setTextWhenInsideStackView(text: self.normalTitle)
-                self.backgroundColor = appearance.normalStateBackGroundColor
+                btnTitle?.setTextWhenInsideStackView(text: normalTitle)
+                backgroundColor = appearance.normalStateBackGroundColor
             }
         }
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     public func setSelected(image: RtkImage) {
-        self.selectedImage = RtkImage.init(image: image.image?.withRenderingMode(.alwaysTemplate), url: image.url)
+        selectedImage = RtkImage(image: image.image?.withRenderingMode(.alwaysTemplate), url: image.url)
     }
-    
+
     public func setSelected(title: String) {
-        self.selectedTitle = title
+        selectedTitle = title
     }
-    
-   private func createButton() {
+
+    private func createButton() {
         let baseView = UIView()
-        self.addSubview(baseView)
+        addSubview(baseView)
         baseView.set(.fillSuperView(self))
         baseView.isUserInteractionEnabled = false
         let buttonsComponent = getLabelAndImageOnlyView()
-        self.btnTitle = buttonsComponent.title
-        self.btnTitle?.setTextWhenInsideStackView(text: self.normalTitle)
-        self.btnTitle?.textColor = appearance.titleColor
-        self.btnImageView = buttonsComponent.imageView
-        self.btnImageView?.tintColor = self.btnTitle?.textColor
+        btnTitle = buttonsComponent.title
+        btnTitle?.setTextWhenInsideStackView(text: normalTitle)
+        btnTitle?.textColor = appearance.titleColor
+        btnImageView = buttonsComponent.imageView
+        btnImageView?.tintColor = btnTitle?.textColor
         baseView.addSubview(buttonsComponent.stackView)
         buttonsComponent.stackView.set(.top(baseView, rtkSharedTokenSpace.space2, .greaterThanOrEqual),
                                        .centerY(baseView),
                                        .leading(baseView, rtkSharedTokenSpace.space2, .greaterThanOrEqual),
                                        .centerX(baseView))
     }
-    
-    private func getLabelAndImageOnlyView() -> (stackView: BaseStackView, title: RtkLabel , imageView: BaseImageView) {
+
+    private func getLabelAndImageOnlyView() -> (stackView: BaseStackView, title: RtkLabel, imageView: BaseImageView) {
         let stackView = RtkUIUtility.createStackView(axis: .horizontal, spacing: rtkSharedTokenSpace.space2)
-        let imageView = RtkUIUtility.createImageView(image: self.normalImage)
-        let title = RtkUIUtility.createLabel(text: self.normalTitle)
+        let imageView = RtkUIUtility.createImageView(image: normalImage)
+        let title = RtkUIUtility.createLabel(text: normalTitle)
         title.font = UIFont.systemFont(ofSize: 14)
-        stackView.addArrangedSubviews(imageView,title)
-        return (stackView: stackView ,title: title,imageView: imageView)
+        stackView.addArrangedSubviews(imageView, title)
+        return (stackView: stackView, title: title, imageView: imageView)
     }
 }
 
-extension RtkPluginScreenShareTabButton {
-    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+public extension RtkPluginScreenShareTabButton {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        self.alpha = 0.6
+        alpha = 0.6
     }
-    
-    public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        self.alpha = 1.0
+        alpha = 1.0
     }
-    
-    public override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
-        self.alpha = 1.0
+        alpha = 1.0
     }
 }
 
 extension RtkPluginScreenShareTabButton {
-      
-     private func showActivityIndicator() {
-          if self.baseActivityIndicatorView == nil {
-              let baseIndicatorView = BaseIndicatorView.createIndicatorView()
-              self.addSubview(baseIndicatorView)
-              baseIndicatorView.set(.fillSuperView(self))
-              self.baseActivityIndicatorView = baseIndicatorView
-          }
-          self.baseActivityIndicatorView?.indicatorView.color = appearance.acitivityInidicatorColor
-          self.baseActivityIndicatorView?.indicatorView.startAnimating()
-          self.baseActivityIndicatorView?.backgroundColor = self.backgroundColor
-          self.bringSubviewToFront(self.baseActivityIndicatorView!)
-          self.baseActivityIndicatorView?.isHidden = false
-      }
-      
+    private func showActivityIndicator() {
+        if baseActivityIndicatorView == nil {
+            let baseIndicatorView = BaseIndicatorView.createIndicatorView()
+            addSubview(baseIndicatorView)
+            baseIndicatorView.set(.fillSuperView(self))
+            baseActivityIndicatorView = baseIndicatorView
+        }
+        baseActivityIndicatorView?.indicatorView.color = appearance.acitivityInidicatorColor
+        baseActivityIndicatorView?.indicatorView.startAnimating()
+        baseActivityIndicatorView?.backgroundColor = backgroundColor
+        bringSubviewToFront(baseActivityIndicatorView!)
+        baseActivityIndicatorView?.isHidden = false
+    }
+
     private func hideActivityIndicator() {
-          self.baseActivityIndicatorView?.indicatorView.stopAnimating()
-          self.baseActivityIndicatorView?.isHidden = true
-      }
+        baseActivityIndicatorView?.indicatorView.stopAnimating()
+        baseActivityIndicatorView?.isHidden = true
+    }
 }
 
 public class SyncScreenShareTabButton: RtkPluginScreenShareTabButton {
-    public override var isSelected: Bool {
+    override public var isSelected: Bool {
         didSet {
             if isSelected == true {
-                if let title = self.selectedTitle {
-                    self.btnTitle?.setTextWhenInsideStackView(text: title)
-                    self.backgroundColor = DesignLibrary.shared.color.status.danger
+                if let title = selectedTitle {
+                    btnTitle?.setTextWhenInsideStackView(text: title)
+                    backgroundColor = DesignLibrary.shared.color.status.danger
                 }
-            }else {
-                self.btnTitle?.setTextWhenInsideStackView(text: self.normalTitle)
-                self.backgroundColor = DesignLibrary.shared.color.status.success
-
+            } else {
+                btnTitle?.setTextWhenInsideStackView(text: normalTitle)
+                backgroundColor = DesignLibrary.shared.color.status.success
             }
         }
     }

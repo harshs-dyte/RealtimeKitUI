@@ -11,46 +11,44 @@ protocol Searchable {
     func search(text: String) -> Bool
 }
 
-
 protocol ReusableObject: AnyObject {}
 
 extension ReusableObject {
     public static var reuseIdentifier: String {
-        return String(describing: self)
+        String(describing: self)
     }
 }
 
-
 public protocol SetTopbar {
-    var topBar: RtkNavigationBar {get}
-    var shouldShowTopBar: Bool {get}
+    var topBar: RtkNavigationBar { get }
+    var shouldShowTopBar: Bool { get }
 }
-extension SetTopbar where Self:UIViewController {
-    func addTopBar(dismissAnimation: Bool, completion:(()->Void)? = nil) {
-        self.view.addSubview(self.topBar)
+
+extension SetTopbar where Self: UIViewController {
+    func addTopBar(dismissAnimation: Bool, completion: (() -> Void)? = nil) {
+        view.addSubview(topBar)
         if shouldShowTopBar {
-            topBar.setBackButtonClick { [weak self] button in
-                guard let self = self else {return}
-                if self.isModal {
-                    self.dismiss(animated: dismissAnimation, completion: completion)
-                }else {
-                    self.navigationController?.popViewController(animated: dismissAnimation)
+            topBar.setBackButtonClick { [weak self] _ in
+                guard let self else { return }
+                if isModal {
+                    dismiss(animated: dismissAnimation, completion: completion)
+                } else {
+                    navigationController?.popViewController(animated: dismissAnimation)
                     completion?()
                 }
             }
-            topBar.set(.sameLeadingTrailing(self.view),
-                       .top(self.view),
+            topBar.set(.sameLeadingTrailing(view),
+                       .top(view),
                        .height(44))
         } else {
-            topBar.set(.sameLeadingTrailing(self.view),
-                       .top(self.view),
+            topBar.set(.sameLeadingTrailing(view),
+                       .top(view),
                        .height(0))
         }
     }
 }
 
-
-internal protocol KeyboardObservable: AnyObject {
+protocol KeyboardObservable: AnyObject {
     var keyboardObserver: KeyboardObserver? { get set }
     func startKeyboardObserving(onShow: @escaping (_ keyboardFrame: CGRect) -> Void,
                                 onHide: @escaping () -> Void)
@@ -59,14 +57,13 @@ internal protocol KeyboardObservable: AnyObject {
 
 extension KeyboardObservable {
     public func startKeyboardObserving(onShow: @escaping (_ keyboardFrame: CGRect) -> Void,
-                                onHide: @escaping () -> Void) {
+                                       onHide: @escaping () -> Void)
+    {
         keyboardObserver = KeyboardObserver(onShow: onShow, onHide: onHide)
     }
-    
-    
-    public  func stopKeyboardObserving() {
+
+    public func stopKeyboardObserving() {
         keyboardObserver?.stopObserving()
         keyboardObserver = nil
     }
-
 }

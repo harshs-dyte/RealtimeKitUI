@@ -8,16 +8,15 @@
 import UIKit
 
 struct FontToken {
-    
-    public let size300: CGFloat
-    public let size250: CGFloat
-    public let size200: CGFloat
-    public let size150: CGFloat
-    public let size125: CGFloat
-    public let size100: CGFloat
-    public let size88: CGFloat
-    public let size75: CGFloat
-    
+    let size300: CGFloat
+    let size250: CGFloat
+    let size200: CGFloat
+    let size150: CGFloat
+    let size125: CGFloat
+    let size100: CGFloat
+    let size88: CGFloat
+    let size75: CGFloat
+
     init(base: CGFloat = 16) {
         size300 = 3.0 * base
         size250 = 2.5 * base

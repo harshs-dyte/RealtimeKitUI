@@ -8,7 +8,6 @@
 import UIKit
 
 public class RtkNotificationBadgeView: UIView {
-
     private let label: UILabel = {
         let label = UILabel()
         label.textColor = UIColor.white
@@ -31,15 +30,15 @@ public class RtkNotificationBadgeView: UIView {
         layer.cornerRadius = bounds.width / 2
         clipsToBounds = true
         addSubview(label)
-        label.set(.sameTopBottom(self,2),
-                  .sameLeadingTrailing(self,3),
-                  .width(10,.greaterThanOrEqual))
+        label.set(.sameTopBottom(self, 2),
+                  .sameLeadingTrailing(self, 3),
+                  .width(10, .greaterThanOrEqual))
     }
-    
+
     public func setBadgeCount(_ count: Int) {
         if count > 99 {
             label.text = count > 0 ? "\(count)+" : nil
-        }else {
+        } else {
             label.text = count > 0 ? "\(count)" : nil
         }
         isHidden = count <= 0

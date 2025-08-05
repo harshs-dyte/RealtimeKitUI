@@ -5,41 +5,40 @@
 //  Created by sudhir kumar on 08/02/23.
 //
 
-import UIKit
 import RealtimeKit
+import UIKit
 
 open class RtkJoinButton: RtkButton {
-    
-    let completion: ((RtkJoinButton,Bool)->Void)?
+    let completion: ((RtkJoinButton, Bool) -> Void)?
     private let meeting: RealtimeKitClient
-    
-    public init(meeting: RealtimeKitClient, onClick:((RtkJoinButton, Bool)->Void)? = nil, appearance: RtkButtonAppearance = AppTheme.shared.buttonAppearance) {
+
+    public init(meeting: RealtimeKitClient, onClick: ((RtkJoinButton, Bool) -> Void)? = nil, appearance: RtkButtonAppearance = AppTheme.shared.buttonAppearance) {
         self.meeting = meeting
-        self.completion = onClick
+        completion = onClick
         super.init(appearance: appearance)
-        self.setTitle("  Join  ", for: .normal)
-        self.addTarget(self, action: #selector(onClick(button:)), for: .touchUpInside)
+        setTitle("  Join  ", for: .normal)
+        addTarget(self, action: #selector(onClick(button:)), for: .touchUpInside)
     }
 
-    
-    required public init?(coder: NSCoder) {
+    @available(*, unavailable)
+    public required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     @objc open func onClick(button: RtkJoinButton) {
         let userName = meeting.localUser.name
         if userName.trimmingCharacters(in: .whitespaces).isEmpty || userName == "Join as XYZ" {
             RtkUIUtility.displayAlert(alertTitle: "Error", message: "Name Required")
         } else {
             button.showActivityIndicator()
-            self.meeting.joinRoom(onSuccess: { [weak self] in
-                guard let self = self else {return}
+            meeting.joinRoom(onSuccess: { [weak self] in
+                guard let self else { return }
                 button.hideActivityIndicator()
-                self.completion?(button,true)
-            }, onFailure: { [weak self] err in
-                guard let self = self else {return}
+                completion?(button, true)
+            }, onFailure: { [weak self] _ in
+                guard let self else { return }
                 button.hideActivityIndicator()
-                self.completion?(button,false)
+                completion?(button, false)
             })
         }
     }

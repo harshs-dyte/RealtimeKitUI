@@ -8,7 +8,6 @@
 import Foundation
 import RealtimeKit
 
-
 protocol RtkStageDelegate: AnyObject {
     func onPresentRequestAdded(participant: RtkRemoteParticipant)
     func onPresentRequestWithdrawn(participant: RtkRemoteParticipant)
@@ -17,48 +16,33 @@ protocol RtkStageDelegate: AnyObject {
 class WebinarViewModel {
     var stageDelegate: RtkStageDelegate?
     private let rtkClient: RealtimeKitClient
-    
-    public init(rtkClient: RealtimeKitClient) {
+
+    init(rtkClient: RealtimeKitClient) {
         self.rtkClient = rtkClient
         rtkClient.addStageEventListener(stageEventListener: self)
     }
 }
 
 extension WebinarViewModel: RtkStageEventListener {
-    func onNewStageAccessRequest(participant: RtkRemoteParticipant) {
-        
-    }
-    
-    func onPeerStageStatusUpdated(participant: RtkRemoteParticipant, oldStatus: RealtimeKit.StageStatus, newStatus: RealtimeKit.StageStatus) {
-        
-    }
-    
-    func onRemovedFromStage() {
-        
-    }
-    
-    func onStageAccessRequestAccepted() {
-        
-    }
-    
-    func onStageAccessRequestRejected() {
-        
-    }
-    
-    func onStageAccessRequestsUpdated(accessRequests: [RtkRemoteParticipant]) {
-        
-    }
-    
-    func onStageStatusUpdated(oldStatus: RealtimeKit.StageStatus, newStatus: RealtimeKit.StageStatus) {
-        
-    }
-    
+    func onNewStageAccessRequest(participant _: RtkRemoteParticipant) {}
+
+    func onPeerStageStatusUpdated(participant _: RtkRemoteParticipant, oldStatus _: RealtimeKit.StageStatus, newStatus _: RealtimeKit.StageStatus) {}
+
+    func onRemovedFromStage() {}
+
+    func onStageAccessRequestAccepted() {}
+
+    func onStageAccessRequestRejected() {}
+
+    func onStageAccessRequestsUpdated(accessRequests _: [RtkRemoteParticipant]) {}
+
+    func onStageStatusUpdated(oldStatus _: RealtimeKit.StageStatus, newStatus _: RealtimeKit.StageStatus) {}
+
     func onPresentRequestWithdrawn(participant: RtkRemoteParticipant) {
         stageDelegate?.onPresentRequestWithdrawn(participant: participant)
     }
-    
+
     func onPresentRequestAdded(participant: RtkRemoteParticipant) {
         stageDelegate?.onPresentRequestAdded(participant: participant)
     }
-    
 }

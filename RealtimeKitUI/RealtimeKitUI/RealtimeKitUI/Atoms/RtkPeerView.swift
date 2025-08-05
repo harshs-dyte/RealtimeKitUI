@@ -7,36 +7,35 @@
 
 import Foundation
 
-
 protocol RtkPeerViewDesignDependency: BaseAppearance {
-    var backgroundColor: BackgroundColorToken.Shade {get}
-    var cornerRadius: BorderRadiusToken.RadiusType {get}
+    var backgroundColor: BackgroundColorToken.Shade { get }
+    var cornerRadius: BorderRadiusToken.RadiusType { get }
 }
 
 class RtkPeerViewViewModel: RtkPeerViewDesignDependency {
-    public var desingLibrary: RtkDesignTokens
+    var desingLibrary: RtkDesignTokens
     var backgroundColor: BackgroundColorToken.Shade
     var cornerRadius: BorderRadiusToken.RadiusType = .rounded
-    
-    required public init(designLibrary: RtkDesignTokens = DesignLibrary.shared) {
-        self.desingLibrary = designLibrary
+
+    required init(designLibrary: RtkDesignTokens = DesignLibrary.shared) {
+        desingLibrary = designLibrary
         backgroundColor = designLibrary.color.background.video
     }
 }
 
-public  class RtkPeerView: BaseView {
+public class RtkPeerView: BaseView {
     private let appearance: RtkPeerViewDesignDependency
 
-    init(frame: CGRect, appearance: RtkPeerViewDesignDependency = RtkPeerViewViewModel()) {
+    init(frame _: CGRect, appearance: RtkPeerViewDesignDependency = RtkPeerViewViewModel()) {
         self.appearance = appearance
         super.init(frame: .zero)
-        self.backgroundColor = self.appearance.backgroundColor
-        self.layer.cornerRadius = self.appearance.desingLibrary.borderRadius.getRadius(size: .two, radius: self.appearance.cornerRadius)
-        self.layer.masksToBounds = true
+        backgroundColor = self.appearance.backgroundColor
+        layer.cornerRadius = self.appearance.desingLibrary.borderRadius.getRadius(size: .two, radius: self.appearance.cornerRadius)
+        layer.masksToBounds = true
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
 }

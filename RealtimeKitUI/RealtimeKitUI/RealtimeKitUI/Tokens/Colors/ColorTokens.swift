@@ -1,5 +1,5 @@
 //
-//  Globals.swift
+//  ColorTokens.swift
 //  RealtimeKitUI
 //
 //  Created by sudhir kumar on 22/11/22.
@@ -19,7 +19,3 @@ public class ColorTokens {
         self.textColor = textColor
     }
 }
-
-
-
-

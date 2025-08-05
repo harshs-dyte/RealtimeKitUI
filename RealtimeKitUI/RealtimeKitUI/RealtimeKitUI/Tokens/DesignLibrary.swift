@@ -1,5 +1,5 @@
 //
-//  Tokens.swift
+//  DesignLibrary.swift
 //  RealtimeKitUI
 //
 //  Created by sudhir kumar on 22/11/22.
@@ -7,249 +7,217 @@
 
 import UIKit
 
-
 public protocol RtkDesignTokens {
-    var color: ColorTokens {get}
-    var space: SpaceToken {get}
-    var borderSize: BorderWidthToken {get}
-    var borderRadius: BorderRadiusToken {get}
+    var color: ColorTokens { get }
+    var space: SpaceToken { get }
+    var borderSize: BorderWidthToken { get }
+    var borderRadius: BorderRadiusToken { get }
 }
 
 public class DesignLibrary: RtkDesignTokens {
-    
     public var color: ColorTokens
-    public var space: SpaceToken = SpaceToken()
+    public var space: SpaceToken = .init()
     public var borderSize: BorderWidthToken
     public var borderRadius: BorderRadiusToken
-    
-    public static let shared:DesignLibrary = DesignLibrary()
-    
-    
+
+    public static let shared: DesignLibrary = .init()
+
     private init() {
         let configurator = DesignLibraryConfigurator()
-        color =  ColorTokens(brand: BrandColorToken(base: configurator.colorBrandBase),
-                             background: BackgroundColorToken(base: configurator.colorBackgroundBase),
-                             status: StatusColor(danger: configurator.statusDangerColor,
-                                                 success: configurator.statusSuccessColor,
-                                                 warning: configurator.statusWarningColor),
-                             textColor: TextColorToken(background: TextColorToken.Background(base: configurator.textColorBackgroundBase),
-                                                  brand: TextColorToken.Brand(base:configurator.textColorBrandBase)))
-        self.borderRadius = BorderRadiusToken(roundFactor: configurator.cornerRadiusRoundFactor,
+        color = ColorTokens(brand: BrandColorToken(base: configurator.colorBrandBase),
+                            background: BackgroundColorToken(base: configurator.colorBackgroundBase),
+                            status: StatusColor(danger: configurator.statusDangerColor,
+                                                success: configurator.statusSuccessColor,
+                                                warning: configurator.statusWarningColor),
+                            textColor: TextColorToken(background: TextColorToken.Background(base: configurator.textColorBackgroundBase),
+                                                      brand: TextColorToken.Brand(base: configurator.textColorBrandBase)))
+        borderRadius = BorderRadiusToken(roundFactor: configurator.cornerRadiusRoundFactor,
                                          extraRoundFactor: configurator.cornerRadiusExtraRoundFactor,
                                          circularFactor: configurator.cornerRadiusCircularFactor)
-        self.borderSize = BorderWidthToken(thinFactor: configurator.borderSizeThinFactor,
-                                     fatFactor: configurator.borderSizeFatFactor)
+        borderSize = BorderWidthToken(thinFactor: configurator.borderSizeThinFactor,
+                                      fatFactor: configurator.borderSizeFatFactor)
     }
-    
+
     func setConfigurator(configurator: DesignLibraryConfiguratorProtocol) {
-        color =  ColorTokens(brand: BrandColorToken(base: configurator.colorBrandBase),
-                             background: BackgroundColorToken(base: configurator.colorBackgroundBase),
-                             status: StatusColor(danger: configurator.statusDangerColor,
-                                                 success: configurator.statusSuccessColor,
-                                                 warning: configurator.statusWarningColor),
-                             textColor: TextColorToken(background: TextColorToken.Background(base: configurator.textColorBackgroundBase),
-                                                  brand: TextColorToken.Brand(base:configurator.textColorBrandBase)))
-        self.borderRadius = BorderRadiusToken(roundFactor: configurator.cornerRadiusRoundFactor,
+        color = ColorTokens(brand: BrandColorToken(base: configurator.colorBrandBase),
+                            background: BackgroundColorToken(base: configurator.colorBackgroundBase),
+                            status: StatusColor(danger: configurator.statusDangerColor,
+                                                success: configurator.statusSuccessColor,
+                                                warning: configurator.statusWarningColor),
+                            textColor: TextColorToken(background: TextColorToken.Background(base: configurator.textColorBackgroundBase),
+                                                      brand: TextColorToken.Brand(base: configurator.textColorBrandBase)))
+        borderRadius = BorderRadiusToken(roundFactor: configurator.cornerRadiusRoundFactor,
                                          extraRoundFactor: configurator.cornerRadiusExtraRoundFactor,
                                          circularFactor: configurator.cornerRadiusCircularFactor)
-        self.borderSize = BorderWidthToken(thinFactor: configurator.borderSizeThinFactor,
-                                     fatFactor: configurator.borderSizeFatFactor)
+        borderSize = BorderWidthToken(thinFactor: configurator.borderSizeThinFactor,
+                                      fatFactor: configurator.borderSizeFatFactor)
     }
 }
 
 public protocol DesignLibraryConfiguratorProtocol {
-    var colorBackgroundBase: BackgroundColorToken.Shade {get}
-    var colorBrandBase: BrandColorToken.Shade {get}
-    
-    var textColorBackgroundBase: TextColorToken.Background.Shade {get}
-    var textColorBrandBase: TextColorToken.Brand.Shade {get}
-    
-    var statusDangerColor: StatusColor.Shade {get}
-    var statusSuccessColor: StatusColor.Shade {get}
-    var statusWarningColor: StatusColor.Shade {get}
-    
-    var cornerRadiusRoundFactor: CGFloat {get}
-    var cornerRadiusExtraRoundFactor: CGFloat {get}
-    var cornerRadiusCircularFactor: CGFloat {get}
-    
-    var borderSizeThinFactor: CGFloat {get}
-    var borderSizeFatFactor: CGFloat {get}
+    var colorBackgroundBase: BackgroundColorToken.Shade { get }
+    var colorBrandBase: BrandColorToken.Shade { get }
+
+    var textColorBackgroundBase: TextColorToken.Background.Shade { get }
+    var textColorBrandBase: TextColorToken.Brand.Shade { get }
+
+    var statusDangerColor: StatusColor.Shade { get }
+    var statusSuccessColor: StatusColor.Shade { get }
+    var statusWarningColor: StatusColor.Shade { get }
+
+    var cornerRadiusRoundFactor: CGFloat { get }
+    var cornerRadiusExtraRoundFactor: CGFloat { get }
+    var cornerRadiusCircularFactor: CGFloat { get }
+
+    var borderSizeThinFactor: CGFloat { get }
+    var borderSizeFatFactor: CGFloat { get }
 }
 
-
 class DesignLibraryConfigurator: DesignLibraryConfiguratorProtocol {
-    
-    public let colorBackgroundBase: BackgroundColorToken.Shade = BackgroundColorToken.Shade(hex: "#050505")!
-    public let colorBrandBase: BrandColorToken.Shade = BrandColorToken.Shade(hex: "#0246FD")!
-    
-    public let textColorBackgroundBase: TextColorToken.Background.Shade = TextColorToken.Background.Shade(hex: "#FFFFFF")!
-    public let textColorBrandBase: TextColorToken.Brand.Shade = TextColorToken.Brand.Shade(hex: "#111111")!
-    
-    public let statusDangerColor: StatusColor.Shade = StatusColor.Shade(hex: "#FF2D2D")!
-    public let statusSuccessColor: StatusColor.Shade = StatusColor.Shade(hex: "#83D017")!
-    public let statusWarningColor: StatusColor.Shade = StatusColor.Shade(hex: "#FFCD07")!
-    
-    public let cornerRadiusRoundFactor: CGFloat = 4.0
-    public let cornerRadiusExtraRoundFactor: CGFloat = 8.0
-    public let cornerRadiusCircularFactor: CGFloat = 8.0
-    
-    public let borderSizeThinFactor: CGFloat =  1.0
-    public let borderSizeFatFactor: CGFloat = 2.0
-    
+    let colorBackgroundBase: BackgroundColorToken.Shade = .init(hex: "#050505")!
+    let colorBrandBase: BrandColorToken.Shade = .init(hex: "#0246FD")!
+
+    let textColorBackgroundBase: TextColorToken.Background.Shade = .init(hex: "#FFFFFF")!
+    let textColorBrandBase: TextColorToken.Brand.Shade = .init(hex: "#111111")!
+
+    let statusDangerColor: StatusColor.Shade = .init(hex: "#FF2D2D")!
+    let statusSuccessColor: StatusColor.Shade = .init(hex: "#83D017")!
+    let statusWarningColor: StatusColor.Shade = .init(hex: "#FFCD07")!
+
+    let cornerRadiusRoundFactor: CGFloat = 4.0
+    let cornerRadiusExtraRoundFactor: CGFloat = 8.0
+    let cornerRadiusCircularFactor: CGFloat = 8.0
+
+    let borderSizeThinFactor: CGFloat = 1.0
+    let borderSizeFatFactor: CGFloat = 2.0
 }
 
 public protocol AppThemeProtocol {
-    var cornerRadiusTypeButton: BorderRadiusToken.RadiusType? {get}
-    var cornerRadiusTypePaginationView: BorderRadiusToken.RadiusType? {get}
-    var cornerRadiusTypePeerView: BorderRadiusToken.RadiusType? {get}
-    var cornerRadiusTypeDropDown: BorderRadiusToken.RadiusType?{get}
-    var cornerRadiusTypeNameTag: BorderRadiusToken.RadiusType? {get}
-    var cornerRadiusTypeNameTextField: BorderRadiusToken.RadiusType?{get}
-    var cornerRadiusTypeCreateView: BorderRadiusToken.RadiusType?{get}
-    var cornerRadiusTypeNameBottomSheet: BorderRadiusToken.RadiusType?{get}
-    var borderSizeWidthTypeTextField: BorderWidthToken.Width? {get}
-    var borderSizeWidthTypeButton: BorderWidthToken.Width? {get}
-    var borderSizeWidthTypeDropDown: BorderWidthToken.Width? {get}
-    
-    var cornerRadiusTypeImageView: BorderRadiusToken.RadiusType {get}
-    var controlBarButtonAppearance: RtkControlBarButtonAppearance {get}
-    var buttonAppearance: RtkButtonAppearance {get}
-    var nameTagAppearance: RtkNameTagAppearance {get}
-    var clockViewAppearance: RtkTextAppearance {get}
-    var meetingTitleAppearance: RtkTextAppearance {get}
-    var participantCountAppearance: RtkTextAppearance {get}
-    var recordingViewAppearance:RtkRecordingViewAppearance {get}
-    var designLibrary: RtkDesignTokens {get}
+    var cornerRadiusTypeButton: BorderRadiusToken.RadiusType? { get }
+    var cornerRadiusTypePaginationView: BorderRadiusToken.RadiusType? { get }
+    var cornerRadiusTypePeerView: BorderRadiusToken.RadiusType? { get }
+    var cornerRadiusTypeDropDown: BorderRadiusToken.RadiusType? { get }
+    var cornerRadiusTypeNameTag: BorderRadiusToken.RadiusType? { get }
+    var cornerRadiusTypeNameTextField: BorderRadiusToken.RadiusType? { get }
+    var cornerRadiusTypeCreateView: BorderRadiusToken.RadiusType? { get }
+    var cornerRadiusTypeNameBottomSheet: BorderRadiusToken.RadiusType? { get }
+    var borderSizeWidthTypeTextField: BorderWidthToken.Width? { get }
+    var borderSizeWidthTypeButton: BorderWidthToken.Width? { get }
+    var borderSizeWidthTypeDropDown: BorderWidthToken.Width? { get }
+
+    var cornerRadiusTypeImageView: BorderRadiusToken.RadiusType { get }
+    var controlBarButtonAppearance: RtkControlBarButtonAppearance { get }
+    var buttonAppearance: RtkButtonAppearance { get }
+    var nameTagAppearance: RtkNameTagAppearance { get }
+    var clockViewAppearance: RtkTextAppearance { get }
+    var meetingTitleAppearance: RtkTextAppearance { get }
+    var participantCountAppearance: RtkTextAppearance { get }
+    var recordingViewAppearance: RtkRecordingViewAppearance { get }
+    var designLibrary: RtkDesignTokens { get }
     init(designToken: RtkDesignTokens)
 }
 
 class AppThemeConfigurator: AppThemeProtocol {
-      
     var designLibrary: RtkDesignTokens
-    
+
     var controlBarButtonAppearance: RtkControlBarButtonAppearance {
-        let model = RtkControlBarButtonAppearanceModel(designLibrary: self.designLibrary)
+        let model = RtkControlBarButtonAppearanceModel(designLibrary: designLibrary)
         return model
     }
-    
+
     var buttonAppearance: RtkButtonAppearance {
-        let model = RtkButtonAppearanceModel(designLibrary: self.designLibrary)
+        let model = RtkButtonAppearanceModel(designLibrary: designLibrary)
         return model
     }
-    
+
     var nameTagAppearance: RtkNameTagAppearance {
-        let model = RtkNameTagAppearanceModel(designLibrary: self.designLibrary)
+        let model = RtkNameTagAppearanceModel(designLibrary: designLibrary)
         return model
     }
-    
+
     var clockViewAppearance: RtkTextAppearance {
-        let model = RtkTextAppearanceModel(designLibrary: self.designLibrary)
+        let model = RtkTextAppearanceModel(designLibrary: designLibrary)
         model.textColor = designLibrary.color.textColor.onBackground.shade700
         model.font = UIFont.systemFont(ofSize: 12)
         return model
     }
-    
+
     var meetingTitleAppearance: RtkTextAppearance {
-        let model = RtkTextAppearanceModel(designLibrary: self.designLibrary)
+        let model = RtkTextAppearanceModel(designLibrary: designLibrary)
         model.font = UIFont.boldSystemFont(ofSize: 16)
         model.textColor = designLibrary.color.textColor.onBackground.shade700
         return model
     }
-    
+
     var participantCountAppearance: RtkTextAppearance {
-        let model = RtkTextAppearanceModel(designLibrary: self.designLibrary)
+        let model = RtkTextAppearanceModel(designLibrary: designLibrary)
         model.textColor = designLibrary.color.textColor.onBackground.shade700
         model.font = UIFont.systemFont(ofSize: 12)
         return model
     }
-    
+
     var recordingViewAppearance: RtkRecordingViewAppearance {
-        return RtkRecordingViewAppearanceModel(designLibrary: self.designLibrary)
+        RtkRecordingViewAppearanceModel(designLibrary: designLibrary)
     }
-    
+
     required init(designToken: RtkDesignTokens) {
-        self.designLibrary = designToken
+        designLibrary = designToken
     }
 
     private let cornerRadiusType: BorderRadiusToken.RadiusType = .rounded
     private let borderSizeWidthType: BorderWidthToken.Width = .fat
-    
+
     var cornerRadiusTypeButton: BorderRadiusToken.RadiusType? {
-        get {
-            return cornerRadiusType
-        }
+        cornerRadiusType
     }
-    
+
     var cornerRadiusTypeImageView: BorderRadiusToken.RadiusType {
-        get {
-            return cornerRadiusType
-        }
+        cornerRadiusType
     }
-    
-    
+
     var cornerRadiusTypePaginationView: BorderRadiusToken.RadiusType? {
-        get {
-            return .extrarounded
-        }
+        .extrarounded
     }
-    
+
     var cornerRadiusTypePeerView: BorderRadiusToken.RadiusType? {
-        get {
-            return cornerRadiusType
-        }
+        cornerRadiusType
     }
-    
+
     var cornerRadiusTypeDropDown: BorderRadiusToken.RadiusType? {
-        get {
-            return cornerRadiusType
-        }
+        cornerRadiusType
     }
-    
+
     var cornerRadiusTypeNameTag: BorderRadiusToken.RadiusType? {
-        get {
-            return cornerRadiusType
-        }
+        cornerRadiusType
     }
-    
+
     var cornerRadiusTypeNameTextField: BorderRadiusToken.RadiusType? {
-        get {
-            return cornerRadiusType
-        }
+        cornerRadiusType
     }
-    
+
     var cornerRadiusTypeCreateView: BorderRadiusToken.RadiusType? {
-        get {
-            return cornerRadiusType
-        }
+        cornerRadiusType
     }
-    
+
     var cornerRadiusTypeNameBottomSheet: BorderRadiusToken.RadiusType? {
-        get {
-            return cornerRadiusType
-        }
+        cornerRadiusType
     }
-    
+
     var borderSizeWidthTypeTextField: BorderWidthToken.Width? {
-        get {
-            return borderSizeWidthType
-        }
+        borderSizeWidthType
     }
-    
+
     var borderSizeWidthTypeButton: BorderWidthToken.Width? {
-        get {
-            return borderSizeWidthType
-        }
+        borderSizeWidthType
     }
-    
+
     var borderSizeWidthTypeDropDown: BorderWidthToken.Width? {
-        get {
-            return borderSizeWidthType
-        }
+        borderSizeWidthType
     }
 }
 
 public class AppTheme {
-    public static let shared:AppTheme = AppTheme(designTokens: DesignLibrary.shared)
+    public static let shared: AppTheme = .init(designTokens: DesignLibrary.shared)
     public var cornerRadiusTypePaginationView: BorderRadiusToken.RadiusType?
     public var cornerRadiusTypePeerView: BorderRadiusToken.RadiusType?
     public var cornerRadiusTypeDropDown: BorderRadiusToken.RadiusType?
@@ -288,7 +256,7 @@ public class AppTheme {
         participantCountAppearance = configurator.participantCountAppearance
         recordingViewAppearance = configurator.recordingViewAppearance
     }
-    
+
     public func setUp(theme: AppThemeProtocol) {
         cornerRadiusTypePaginationView = theme.cornerRadiusTypePaginationView
         cornerRadiusTypePeerView = theme.cornerRadiusTypePeerView
@@ -303,6 +271,5 @@ public class AppTheme {
         buttonAppearance = theme.buttonAppearance
         nameTagAppearance = theme.nameTagAppearance
         recordingViewAppearance = theme.recordingViewAppearance
-
     }
 }

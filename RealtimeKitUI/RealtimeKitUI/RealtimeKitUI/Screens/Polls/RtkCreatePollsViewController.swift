@@ -1,12 +1,12 @@
 //
-//  CreatePollsViewController.swift
+//  RtkCreatePollsViewController.swift
 //  RealtimeKitUI
 //
 //  Created by sudhir kumar on 12/01/23.
 //
 
-import UIKit
 import RealtimeKit
+import UIKit
 
 class RadioTypeImage {
     var selectedImage: RtkImage
@@ -21,16 +21,15 @@ class AutoSizingTextView: UIView {
     let borderRadiusType: BorderRadiusToken.RadiusType = AppTheme.shared.cornerRadiusTypeNameTextField ?? .rounded
     let backGroundColor = DesignLibrary.shared.color.background.shade700
     let textColor = DesignLibrary.shared.color.textColor.onBackground.shade600
-    
-    let textView : UITextView = {return UITextView()}()
 
-    let maxHeight:CGFloat
-    
+    let textView: UITextView = .init()
+
+    let maxHeight: CGFloat
+
     let minimumHeight: CGFloat
-    
-    
+
     private var isMaxHeightConstraintSet = false
-    private  var placeHolderLabel : UILabel!
+    private var placeHolderLabel: UILabel!
 
     var maxHeightAchieved: Bool = false {
         didSet {
@@ -41,7 +40,7 @@ class AutoSizingTextView: UIView {
                         textView.removeConstraint(heightConstraint)
                     }
                     textView.set(.height(textView.intrinsicContentSize.height))
-                    self.textView.isScrollEnabled = true
+                    textView.isScrollEnabled = true
                 }
             } else {
                 textView.isScrollEnabled = false
@@ -49,21 +48,21 @@ class AutoSizingTextView: UIView {
                 if let heightConstraint = textView.get(.height) {
                     textView.removeConstraint(heightConstraint)
                 }
-                
-                textView.set(.height( max(minimumHeight,textView.intrinsicContentSize.height)))
+
+                textView.set(.height(max(minimumHeight, textView.intrinsicContentSize.height)))
             }
         }
     }
-    
+
     init(maxheight height: CGFloat, minHeight: CGFloat = 40, placeHolderText: String = "Enter some text...") {
         maxHeight = height
         minimumHeight = minHeight
         super.init(frame: .zero)
         createSubView(placeHolderText: placeHolderText)
     }
-    
+
     func createSubView(placeHolderText: String) {
-        self.addSubview(textView)
+        addSubview(textView)
         textView.set(.fillSuperView(self), .height(minimumHeight))
         textView.delegate = self
         textView.textColor = textColor
@@ -75,61 +74,62 @@ class AutoSizingTextView: UIView {
                              .top(textView, (textView.font?.pointSize)! / 2))
         placeHolderLabel.isHidden = !textView.text.isEmpty
         textView.layer.cornerRadius = DesignLibrary.shared.borderRadius.getRadius(size: .one,
-                                                                                   radius: borderRadiusType)
+                                                                                  radius: borderRadiusType)
         textView.backgroundColor = backGroundColor
-
     }
-    
+
     func setPlaceHolder(text: String) {
         placeHolderLabel.text = text
     }
-    
+
     func createPlaceholderLabel(text: String) -> UILabel {
-       let placeholderLabel = UILabel()
-           placeholderLabel.text = text
-           placeholderLabel.sizeToFit()
+        let placeholderLabel = UILabel()
+        placeholderLabel.text = text
+        placeholderLabel.sizeToFit()
         placeholderLabel.textColor = textColor
         return placeholderLabel
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
 extension AutoSizingTextView: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         placeHolderLabel.isHidden = !textView.text.isEmpty
         if textView.contentSize.height >= maxHeight {
             maxHeightAchieved = true
-        }else {
+        } else {
             maxHeightAchieved = false
         }
     }
 }
 
 class AutoSizingTitleTextView: BaseMoluculeView {
-    let gapBetweenTitleAndTextView:CGFloat = 8
-        
-    let lblHeader: RtkLabel = { return RtkUIUtility.createLabel(text: "", alignment: .left, weight: UIFont.Weight.bold) }()
+    let gapBetweenTitleAndTextView: CGFloat = 8
+
+    let lblHeader: RtkLabel = RtkUIUtility.createLabel(text: "", alignment: .left, weight: UIFont.Weight.bold)
     let textView: AutoSizingTextView
-    let lblError: RtkLabel = { return RtkUIUtility.createLabel(text: "" , alignment: .left) }()
+    let lblError: RtkLabel = RtkUIUtility.createLabel(text: "", alignment: .left)
 
     init(headerTitle: String, placeHolderText: String) {
         textView = AutoSizingTextView(maxheight: 100, minHeight: 68, placeHolderText: placeHolderText)
         super.init(frame: .zero)
-        self.createSubviews()
+        createSubviews()
         lblHeader.text = headerTitle
-        self.textView.setPlaceHolder(text: placeHolderText)
-        
+        textView.setPlaceHolder(text: placeHolderText)
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func createSubviews() {
         let stackView = RtkUIUtility.createStackView(axis: .vertical, spacing: gapBetweenTitleAndTextView)
-        self.addSubview(stackView)
+        addSubview(stackView)
         stackView.set(.fillSuperView(self))
         stackView.addArrangedSubviews(lblHeader, textView, lblError)
         lblError.isHidden = true
@@ -137,85 +137,85 @@ class AutoSizingTitleTextView: BaseMoluculeView {
 }
 
 class AddOptions: BaseMoluculeView {
-   
     let btnAdd: RtkButton = {
         let button = RtkButton(style: .line, rtkButtonState: .active)
         button.setTitle("Add Options", for: .normal)
         return button
     }()
+
     private var textFields = [TextFieldBaseView]()
     let verticalGap: CGFloat = DesignLibrary.shared.space.space2
     let minimumOptionsToBeShown = 2
     let emptyTextFieldError = "Please insert voting option text"
     let tokenSpace = DesignLibrary.shared.space
     var textFiledCount = 0
-    
+
     let lblErrorColor = DesignLibrary.shared.color.status.danger
     let textFieldBackgroundColorToken = DesignLibrary.shared.color.background.shade700
     let textFieldBorderColorToken =
         DesignLibrary.shared.color.background.shade700
-    
+
     let stackView: UIStackView
-    
+
     init() {
         stackView = RtkUIUtility.createStackView(axis: .vertical, spacing: verticalGap)
         super.init(frame: .zero)
         createSubviews()
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func createSubviews() {
-        self.addSubview(stackView)
-        self.addSubview(btnAdd)
+        addSubview(stackView)
+        addSubview(btnAdd)
         stackView.set(.top(self),
                       .sameLeadingTrailing(self))
-        btnAdd.set(.below(stackView,verticalGap),
+        btnAdd.set(.below(stackView, verticalGap),
                    .sameLeadingTrailing(self),
                    .bottom(self))
         btnAdd.addTarget(self, action: #selector(addButtonClick(sender:)), for: .touchUpInside)
         atoms.append(btnAdd)
 
         var heading: String?
-        for i in 0..<minimumOptionsToBeShown {
+        for i in 0 ..< minimumOptionsToBeShown {
             textFiledCount += 1
             heading = nil
             if i == 0 {
-              heading = "Options"
+                heading = "Options"
             }
             let textFieldBase = addAndSetTextField(heading: heading, placeHolderText: "Option \(textFiledCount)", needRemoveButton: false)
             stackView.addArrangedSubview(textFieldBase)
-            textFieldBase.removeButton?.setClickAction(click: {  [weak self, unowned textFieldBase] _ in
-                guard let self = self else {return}
-                self.stackView.removeFully(view: textFieldBase)
-                if let index = self.textFields.firstIndex(of: textFieldBase) {
-                    self.textFields.remove(at: index)
-                    self.textFiledCount -= 1
+            textFieldBase.removeButton?.setClickAction(click: { [weak self, unowned textFieldBase] _ in
+                guard let self else { return }
+                stackView.removeFully(view: textFieldBase)
+                if let index = textFields.firstIndex(of: textFieldBase) {
+                    textFields.remove(at: index)
+                    textFiledCount -= 1
                 }
             })
-
         }
     }
-    
-    @objc func addButtonClick(sender: RtkButton) {
+
+    @objc func addButtonClick(sender _: RtkButton) {
         if checkAndShowError() {
             return
         }
         textFiledCount += 1
         let textFieldBase = addAndSetTextField(heading: nil, placeHolderText: "Option \(textFiledCount)", needRemoveButton: true)
         stackView.addArrangedSubview(textFieldBase)
-        textFieldBase.removeButton?.setClickAction(click: {  [weak self, unowned textFieldBase] _ in
-            guard let self = self else {return}
-            self.stackView.removeFully(view: textFieldBase)
-            if let index = self.textFields.firstIndex(of: textFieldBase) {
-                self.textFields.remove(at: index)
-                self.textFiledCount -= 1
+        textFieldBase.removeButton?.setClickAction(click: { [weak self, unowned textFieldBase] _ in
+            guard let self else { return }
+            stackView.removeFully(view: textFieldBase)
+            if let index = textFields.firstIndex(of: textFieldBase) {
+                textFields.remove(at: index)
+                textFiledCount -= 1
             }
         })
     }
-    
+
     private func addAndSetTextField(heading: String?, placeHolderText: String, needRemoveButton: Bool) -> TextFieldBaseView {
         let result = addTextField(heading: heading, text: "", needRemoveButton: needRemoveButton)
         let textField = result.textField
@@ -227,8 +227,8 @@ class AddOptions: BaseMoluculeView {
         atoms.append(textField)
         return result
     }
-    
-    private func checkAndShowError()-> Bool {
+
+    private func checkAndShowError() -> Bool {
         for textFieldBase in textFields {
             let textField = textFieldBase.textField
             let isEmpty = textField.text?.isEmpty ?? true
@@ -239,30 +239,30 @@ class AddOptions: BaseMoluculeView {
                     textField.lblError.alpha = 1.0
                 }
                 return true
-            }else {
+            } else {
                 textField.populateError()
             }
         }
         return false
     }
-    
+
     func getText(index: Int) -> String? {
-        if index < 0 && index >= textFields.count {
+        if index < 0, index >= textFields.count {
             return nil
         }
         return textFields[index].textField.text
     }
-    
+
     func getAllOptions() -> [String] {
         var result = [String]()
-        textFields.forEach { textField in
+        for textField in textFields {
             if let text = textField.textField.text, text.isEmpty == false {
                 result.append(text)
             }
         }
         return result
     }
-    
+
     class TextFieldBaseView: UIView {
         let textField: RtkTextField
         let removeButton: RtkButton?
@@ -271,28 +271,28 @@ class AddOptions: BaseMoluculeView {
             self.removeButton = removeButton
             super.init(frame: .zero)
         }
-        
-        required init?(coder: NSCoder) {
+
+        @available(*, unavailable)
+        required init?(coder _: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
     }
-    
-    
+
     private func addTextField(heading: String?, text: String, needRemoveButton: Bool) -> TextFieldBaseView {
         let baseView = UIView()
         let textField = RtkTextField(textFieldBackgroundColorToken: textFieldBackgroundColorToken, borderColor: textFieldBorderColorToken.cgColor)
         textField.errorLabelValidation = { [weak self] (text: String?, textField: RtkTextField) in
-            guard let self = self else {return}
-            if let text = text, text.count >= 1 {
+            guard let self else { return }
+            if let text, text.count >= 1 {
                 textField.populateError()
-            }else {
-                textField.populateError(text: self.emptyTextFieldError)
+            } else {
+                textField.populateError(text: emptyTextFieldError)
             }
         }
         textField.text = text
         textField.populateText(headerText: heading)
         baseView.addSubview(textField)
-        
+
         textField.set(.sameTopBottom(baseView))
         var removalButton: RtkButton? = nil
         if needRemoveButton {
@@ -304,12 +304,12 @@ class AddOptions: BaseMoluculeView {
                                .top(baseView, tokenSpace.space0, .greaterThanOrEqual),
                                .after(textField, tokenSpace.space2),
                                .trailing(baseView))
-            buttonToRemove.setClickAction { [weak self, unowned baseView] button in
-                guard let self = self else {return}
-                self.stackView.removeFully(view: baseView)
+            buttonToRemove.setClickAction { [weak self, unowned baseView] _ in
+                guard let self else { return }
+                stackView.removeFully(view: baseView)
             }
             removalButton = buttonToRemove
-        }else {
+        } else {
             textField.set(.sameLeadingTrailing(baseView))
         }
         let textFieldBase = TextFieldBaseView(textField: textField, removeButton: removalButton)
@@ -318,65 +318,68 @@ class AddOptions: BaseMoluculeView {
         return textFieldBase
     }
 }
-extension AddOptions : UITextFieldDelegate {
-    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        self.endEditing(true)
+
+extension AddOptions: UITextFieldDelegate {
+    func textFieldShouldReturn(_: UITextField) -> Bool {
+        endEditing(true)
         return false
     }
 }
 
 class SelectionView: UIView {
     let spaceToken = DesignLibrary.shared.space
-    let imageView:BaseImageView = { return BaseImageView()}()
+    let imageView: BaseImageView = .init()
     let title: RtkLabel = {
         let label = RtkUIUtility.createLabel(alignment: .left)
         label.numberOfLines = 0
         return label
     }()
+
     private let radioImage: RadioTypeImage
     var index: Int = 0
-    private var clickAction: (SelectionView)->Void
-    
-    init(radioImage: RadioTypeImage, title: String, onClick:@escaping(SelectionView)->Void) {
+    private var clickAction: (SelectionView) -> Void
+
+    init(radioImage: RadioTypeImage, title: String, onClick: @escaping (SelectionView) -> Void) {
         self.radioImage = radioImage
         self.title.text = title
-        self.clickAction = onClick
+        clickAction = onClick
         super.init(frame: .zero)
         createSubView()
-        self.setSelected(selected: false)
+        setSelected(selected: false)
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func createSubView() {
-        self.addSubview(imageView)
-        self.addSubview(title)
+        addSubview(imageView)
+        addSubview(title)
         imageView.set(.leading(self),
-                      .top(self, 0.0 , .greaterThanOrEqual),
+                      .top(self, 0.0, .greaterThanOrEqual),
                       .bottom(self, 0.0, .greaterThanOrEqual),
                       .centerY(title))
-        title.set(.after(imageView,spaceToken.space2),
+        title.set(.after(imageView, spaceToken.space2),
                   .top(self, 0.0, .greaterThanOrEqual),
                   .centerY(self),
                   .trailing(self, 0.0, .greaterThanOrEqual))
     }
-    
+
     var isSelected: Bool = false {
         didSet {
-            self.setSelected(selected: isSelected)
+            setSelected(selected: isSelected)
         }
     }
-    
+
     private func setSelected(selected: Bool) {
         if selected == true {
-            self.imageView.setImage(image: self.radioImage.selectedImage)
-        }else {
-            self.imageView.setImage(image: self.radioImage.normalImage)
+            imageView.setImage(image: radioImage.selectedImage)
+        } else {
+            imageView.setImage(image: radioImage.normalImage)
         }
     }
-    
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         clickAction(self)
@@ -384,9 +387,9 @@ class SelectionView: UIView {
 }
 
 protocol SelectionModel {
-    var image: RadioTypeImage {get}
-    var title: String {get}
-    var isSelected: Bool {get}
+    var image: RadioTypeImage { get }
+    var title: String { get }
+    var isSelected: Bool { get }
 }
 
 enum VotePermissionType {
@@ -415,38 +418,39 @@ enum SelectionType {
 class ListSelectionView<Model: SelectionModel>: UIView {
     let spaceToken = DesignLibrary.shared.space
     let models: [Model]
-    let titleLabel: RtkLabel = {return RtkUIUtility.createLabel(alignment: .left, weight: UIFont.Weight.bold)}()
-    let selectionType : SelectionType
-    
+    let titleLabel: RtkLabel = RtkUIUtility.createLabel(alignment: .left, weight: UIFont.Weight.bold)
+    let selectionType: SelectionType
+
     private let stackView = RtkUIUtility.createStackView(axis: .vertical, spacing: 4)
     private let stackViewSelectionView = RtkUIUtility.createStackView(axis: .vertical, spacing: 4)
 
     private var arrSelectionView = [SelectionView]()
-    
-    init(models: [Model], title: String , selectionType: SelectionType = .multiple) {
+
+    init(models: [Model], title: String, selectionType: SelectionType = .multiple) {
         self.models = models
         self.selectionType = selectionType
         super.init(frame: .zero)
         titleLabel.text = title
         createSubView()
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func createSubView() {
-        self.addSubview(stackView)
+        addSubview(stackView)
         stackView.set(.fillSuperView(self))
-        self.arrSelectionView = createListView(on: stackViewSelectionView)
-        stackView.addArrangedSubviews(titleLabel,stackViewSelectionView)
+        arrSelectionView = createListView(on: stackViewSelectionView)
+        stackView.addArrangedSubviews(titleLabel, stackViewSelectionView)
     }
-    
+
     private func createListView(on stackView: UIStackView) -> [SelectionView] {
         var arrResult = [SelectionView]()
         var index = 0
         for model in models {
-            let view = self.get(image: model.image, title: model.title, isSelected: model.isSelected)
+            let view = get(image: model.image, title: model.title, isSelected: model.isSelected)
             view.index = index
             stackView.addArrangedSubview(view)
             arrResult.append(view)
@@ -454,35 +458,35 @@ class ListSelectionView<Model: SelectionModel>: UIView {
         }
         return arrResult
     }
-    
-    private func get(image: RadioTypeImage, title: String, isSelected: Bool) -> SelectionView {
-        let view  = SelectionView(radioImage: image, title: title) { [weak self] selectionView in
-            guard let self = self else { return }
-            if self.selectionType == .radio {
-                self.selectView(at: selectionView.index)
 
-            }else {
+    private func get(image: RadioTypeImage, title: String, isSelected: Bool) -> SelectionView {
+        let view = SelectionView(radioImage: image, title: title) { [weak self] selectionView in
+            guard let self else { return }
+            if selectionType == .radio {
+                selectView(at: selectionView.index)
+
+            } else {
                 selectionView.isSelected = !selectionView.isSelected
             }
         }
         view.isSelected = isSelected
         return view
     }
-    
+
     private func selectView(at index: Int) {
         var key = 0
         for view in arrSelectionView {
             if key == index {
                 view.isSelected = true
-            }else {
+            } else {
                 view.isSelected = false
             }
             key += 1
         }
     }
-    
-   public func getCurrentSelectedIndex() -> [Int]? {
-        var index: Int = 0
+
+    func getCurrentSelectedIndex() -> [Int]? {
+        var index = 0
         var result = [Int]()
         for view in arrSelectionView {
             if view.isSelected == true {
@@ -490,29 +494,26 @@ class ListSelectionView<Model: SelectionModel>: UIView {
             }
             index += 1
         }
-       return result.count > 0 ? result : nil
+        return result.count > 0 ? result : nil
     }
 }
 
-
 class CreatePollView: UIView {
-    
     let space = DesignLibrary.shared.space
 
     let borderRadiusType: BorderRadiusToken.RadiusType = AppTheme.shared.cornerRadiusTypeCreateView ?? .rounded
 
     let backGroundColor = DesignLibrary.shared.color.background.shade900
-  
-    
+
     let verticalSpacingBetweenElemements = DesignLibrary.shared.space.space4
-    
+
     let lblHeader: RtkLabel = {
         let label = RtkUIUtility.createLabel(text: "Create Poll", alignment: .left)
         label.font = UIFont.systemFont(ofSize: 20, weight: UIFont.Weight.bold)
         return label
     }()
-    
-    let askQuestionTextView : AutoSizingTitleTextView = {
+
+    let askQuestionTextView: AutoSizingTitleTextView = {
         let textView = AutoSizingTitleTextView(headerTitle: "Question", placeHolderText: "Ask a question")
         textView.lblError.text = "Please insert valid question to be asked in poll"
         textView.lblError.textColor = DesignLibrary.shared.color.status.danger
@@ -521,26 +522,24 @@ class CreatePollView: UIView {
         textView.accessibilityIdentifier = "CreatePoll_Title_TextView"
         return textView
     }()
-    
-    let addOptionView: AddOptions = { return AddOptions() }()
-    
+
+    let addOptionView: AddOptions = .init()
+
     let permissionSelectionView: ListSelectionView = {
         let selectedImage = RtkImage(image: ImageProvider.image(named: "icon_radiobutton_selected"))
         let unSelectedImage = RtkImage(image: ImageProvider.image(named: "icon_radiobutton_unselected"))
         var model = [ListSelectionModel]()
-        
+
         model.append(ListSelectionModel(image: RadioTypeImage(selectedImage: selectedImage, normalImage: unSelectedImage), title: "Anonymous", permission: .anonymous, isSelected: false))
         model.append(ListSelectionModel(image: RadioTypeImage(selectedImage: selectedImage, normalImage: unSelectedImage), title: "Hide result before voting", permission: .hideResultBeforeVoting, isSelected: true))
         let selectionView = ListSelectionView(models: model, title: "Show Result")
         return selectionView
     }()
-    
+
     var question: String? {
-        get {
-            return self.askQuestionTextView.textView.textView.text
-        }
+        askQuestionTextView.textView.textView.text
     }
-    
+
     let btnCancel: RtkButton = {
         let button = RtkButton(style: .text, size: .medium)
         button.setTitle("Cancel", for: .normal)
@@ -548,30 +547,31 @@ class CreatePollView: UIView {
         button.accessibilityIdentifier = "CreatePoll_Cancel_Button"
         return button
     }()
-    
+
     let btnPublish: RtkButton = {
         let button = RtkButton(style: .solid, size: .medium)
         button.setTitle("  Publish  ", for: .normal)
         button.accessibilityIdentifier = "CreatePoll_Publish_Button"
         return button
     }()
-    
+
     let baseView = UIView()
-    
+
     init() {
         super.init(frame: .zero)
-        self.addSubview(baseView)
+        addSubview(baseView)
         baseView.set(.fillSuperView(self, space.space4))
         createSubView(on: baseView)
-        self.backgroundColor = backGroundColor
-        self.layer.cornerRadius = DesignLibrary.shared.borderRadius.getRadius(size: .one, radius: borderRadiusType)
-        self.layer.masksToBounds = true
+        backgroundColor = backGroundColor
+        layer.cornerRadius = DesignLibrary.shared.borderRadius.getRadius(size: .one, radius: borderRadiusType)
+        layer.masksToBounds = true
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func createSubView(on view: UIView) {
         view.addSubview(lblHeader)
         view.addSubview(askQuestionTextView)
@@ -579,23 +579,21 @@ class CreatePollView: UIView {
         view.addSubview(permissionSelectionView)
         view.addSubview(btnCancel)
         view.addSubview(btnPublish)
-        
+
         lblHeader.set(.sameLeadingTrailing(view),
                       .top(view))
         askQuestionTextView.set(.sameLeadingTrailing(view),
                                 .below(lblHeader, verticalSpacingBetweenElemements))
         addOptionView.set(.sameLeadingTrailing(view),
                           .below(askQuestionTextView, verticalSpacingBetweenElemements))
-        permissionSelectionView.set(.below(addOptionView, verticalSpacingBetweenElemements*2),
-                          .sameLeadingTrailing(view))
+        permissionSelectionView.set(.below(addOptionView, verticalSpacingBetweenElemements * 2),
+                                    .sameLeadingTrailing(view))
         btnPublish.set(.bottom(view),
                        .trailing(view),
                        .below(permissionSelectionView, verticalSpacingBetweenElemements))
         btnCancel.set(.leading(view),
-                       .centerY(btnPublish))
-        
+                      .centerY(btnPublish))
     }
-
 }
 
 enum Result<Value, Error: Swift.Error> {
@@ -604,41 +602,42 @@ enum Result<Value, Error: Swift.Error> {
 }
 
 public class RtkCreatePollsViewController: UIViewController, KeyboardObservable {
-    let scrollView:UIScrollView = {return UIScrollView()}()
+    let scrollView: UIScrollView = .init()
     var keyboardObserver: KeyboardObserver?
     let rtkClient: RealtimeKitClient
-    let completion:(Result<Bool,Error>)->Void
+    let completion: (Result<Bool, Error>) -> Void
     let tokenSpace = DesignLibrary.shared.space
     private var createPollView: CreatePollView!
-    
-    init(rtkClient: RealtimeKitClient, completion:@escaping(Result<Bool,Error>)->Void) {
+
+    init(rtkClient: RealtimeKitClient, completion: @escaping (Result<Bool, Error>) -> Void) {
         self.rtkClient = rtkClient
         self.completion = completion
         super.init(nibName: nil, bundle: nil)
         self.rtkClient.addPollsEventListener(pollsEventListener: self)
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    public override func viewDidLoad() {
+
+    override public func viewDidLoad() {
         super.viewDidLoad()
-        self.view.accessibilityIdentifier = "Create_Polls_Screen"
+        view.accessibilityIdentifier = "Create_Polls_Screen"
         setUpView()
     }
-    
+
     private func setUpView() {
-        createSubView(on: self.view)
+        createSubView(on: view)
         setupKeyboard()
     }
-    
+
     private func createSubView(on view: UIView) {
         view.addSubview(scrollView)
         let createPollView = CreatePollView()
         createPollView.btnPublish.addTarget(self, action: #selector(publishButtonClick(button:)), for: .touchUpInside)
         createPollView.btnCancel.addTarget(self, action: #selector(cancelButtonClick(button:)), for: .touchUpInside)
-        
+
         scrollView.addSubview(createPollView)
         createPollView.set(.fillSuperView(scrollView))
         scrollView.set(.leading(view, tokenSpace.space3),
@@ -648,77 +647,69 @@ public class RtkCreatePollsViewController: UIViewController, KeyboardObservable 
                        .equateAttribute(.width, toView: createPollView, toAttribute: .width, withRelation: .equal))
         self.createPollView = createPollView
     }
-             
+
     var createdByMe = false
-    @objc func publishButtonClick(button : RtkButton) {
-        let addOptionView = self.createPollView.addOptionView
+    @objc func publishButtonClick(button: RtkButton) {
+        let addOptionView = createPollView.addOptionView
         let allOptions = addOptionView.getAllOptions()
-        if  let question = self.createPollView.question, question.count > 2 {
-            self.createPollView.askQuestionTextView.lblError.isHidden = true
+        if let question = createPollView.question, question.count > 2 {
+            createPollView.askQuestionTextView.lblError.isHidden = true
             if allOptions.count >= addOptionView.minimumOptionsToBeShown {
                 button.showActivityIndicator()
 
                 var anonymous = false
                 var hideVotes = false
-                if let currentPermissionSelectedIndex = self.createPollView.permissionSelectionView.getCurrentSelectedIndex() {
-                    currentPermissionSelectedIndex.forEach { index in
-                        let model = self.createPollView.permissionSelectionView.models[index]
+                if let currentPermissionSelectedIndex = createPollView.permissionSelectionView.getCurrentSelectedIndex() {
+                    for index in currentPermissionSelectedIndex {
+                        let model = createPollView.permissionSelectionView.models[index]
                         if model.permission == .anonymous {
                             anonymous = true
-                        }
-                        else if model.permission == .hideResultBeforeVoting {
+                        } else if model.permission == .hideResultBeforeVoting {
                             hideVotes = true
                         }
                     }
                 }
-                
-                self.rtkClient.polls.create(question: question, options: allOptions, anonymous: anonymous, hideVotes: hideVotes)
+
+                rtkClient.polls.create(question: question, options: allOptions, anonymous: anonymous, hideVotes: hideVotes)
                 // For now  It is  working as fire and Forget , Actually we need an event which tell us that poll created successfully or not. Or else PollMessage must have UserId of user who created this poll.
                 createdByMe = true
             }
-        }else {
-            self.createPollView.askQuestionTextView.lblError.isHidden = false
+        } else {
+            createPollView.askQuestionTextView.lblError.isHidden = false
         }
-        
     }
-    
-    @objc func cancelButtonClick(button : RtkButton) {
-        self.rtkClient.removePollsEventListener(pollsEventListener: self)
-        self.completion(.success(false))
+
+    @objc func cancelButtonClick(button _: RtkButton) {
+        rtkClient.removePollsEventListener(pollsEventListener: self)
+        completion(.success(false))
     }
-    
+
     private func setupKeyboard() {
-        self.startKeyboardObserving { keyboardFrame in
+        startKeyboardObserving { keyboardFrame in
             self.scrollView.get(.bottom)?.constant = -keyboardFrame.height
-           // self.view.frame.origin.y = keyboardFrame.origin.y - self.scrollView.frame.maxY
+            // self.view.frame.origin.y = keyboardFrame.origin.y - self.scrollView.frame.maxY
         } onHide: {
             self.scrollView.get(.bottom)?.constant = 0
 
-           // self.view.frame.origin.y = 0 // Move view to original position
+            // self.view.frame.origin.y = 0 // Move view to original position
         }
     }
-    
-    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.view.endEditing(true)
+
+    override public func touchesBegan(_: Set<UITouch>, with _: UIEvent?) {
+        view.endEditing(true)
     }
 }
+
 extension RtkCreatePollsViewController: RtkPollsEventListener {
-    public func onPollUpdate(poll: Poll) {
-        
-    }
-    
-    public func onNewPoll(poll: Poll) {
+    public func onPollUpdate(poll _: Poll) {}
+
+    public func onNewPoll(poll _: Poll) {
         if createdByMe {
             createdByMe = false
-            self.rtkClient.removePollsEventListener(pollsEventListener: self)
-            self.completion(.success(true))
+            rtkClient.removePollsEventListener(pollsEventListener: self)
+            completion(.success(true))
         }
     }
-    
-    public func onPollUpdates(pollItems: [Poll]) {
-        
-    }
+
+    public func onPollUpdates(pollItems _: [Poll]) {}
 }
-
-
-    

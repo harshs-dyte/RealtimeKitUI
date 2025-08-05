@@ -18,9 +18,10 @@ protocol MeetingViewModelDelegate: AnyObject {
     func participantLeft(participant: RtkMeetingParticipant)
     func newPollAdded(createdBy: String)
 }
+
 extension MeetingViewModelDelegate {
     func refreshMeetingGrid() {
-        self.refreshMeetingGrid(forRotation: false)
+        refreshMeetingGrid(forRotation: false)
     }
 }
 
@@ -40,34 +41,32 @@ public class GridCellViewModel {
     public var nameInitials: String
     public var fullName: String
     public var participant: RtkMeetingParticipant
-    public  init(participant: RtkMeetingParticipant) {
+    public init(participant: RtkMeetingParticipant) {
         self.participant = participant
-        self.fullName = participant.name
+        fullName = participant.name
         let formatter = PersonNameComponentsFormatter()
         if let components = formatter.personNameComponents(from: participant.name) {
             formatter.style = .abbreviated
-            self.nameInitials = formatter.string(from: components)
-        }else {
+            nameInitials = formatter.string(from: components)
+        } else {
             if let first = fullName.first {
-                self.nameInitials = "\(first)"
-            }else {
-                self.nameInitials = ""
+                nameInitials = "\(first)"
+            } else {
+                nameInitials = ""
             }
         }
-        
     }
 }
 
-
 public class ScreenShareViewModel {
     public var arrScreenShareParticipants = [ParticipantsShareControl]()
-    private var dict = [String : Int]()
+    private var dict = [String: Int]()
     public var selectedIndex: (UInt, String)?
     private let selfActiveTab: ActiveTab?
     public init(selfActiveTab: ActiveTab?) {
         self.selfActiveTab = selfActiveTab
     }
-    
+
     public func refresh(plugins: [RtkPlugin], selectedPlugin: RtkPlugin?) {
         for plugin in plugins {
             if dict[plugin.id] == nil {
@@ -77,21 +76,21 @@ public class ScreenShareViewModel {
         }
         selectPlugin(oldId: selectedPlugin?.id)
     }
-    
+
     public func removed(plugin: RtkPlugin) {
         removePlugin(id: plugin.id)
         selectPlugin(oldId: selectedIndex?.1)
     }
-    
+
     private func removePlugin(id: String) {
-        if let index =  arrScreenShareParticipants.firstIndex(where: { item in
-            return item.id == id
+        if let index = arrScreenShareParticipants.firstIndex(where: { item in
+            item.id == id
         }) {
             arrScreenShareParticipants.remove(at: index)
             dict[id] = nil
         }
     }
-    
+
     public func refresh(participants: [RtkMeetingParticipant]) {
         for participant in participants {
             if dict[participant.id] == nil {
@@ -99,9 +98,9 @@ public class ScreenShareViewModel {
                 dict[participant.id] = arrScreenShareParticipants.count - 1
             }
         }
-        
+
         func getUseLessIds() -> [String] {
-            var result = [String] ()
+            var result = [String]()
             for participant in arrScreenShareParticipants {
                 if let screenShare = participant as? ScreenShareModel {
                     // check only for ScreenShare which are now not a part of active participants are use less
@@ -119,76 +118,74 @@ public class ScreenShareViewModel {
             }
             return result
         }
-        
+
         let useLessId = getUseLessIds()
         for id in useLessId {
             removePlugin(id: id)
         }
         selectPlugin(oldId: selectedIndex?.1)
     }
-    
+
     private func selectPlugin(oldId: String?) {
         let oldId = oldId
-        
-        if let selfActiveTab = self.selfActiveTab , selectedIndex == nil {
+
+        if let selfActiveTab, selectedIndex == nil {
             var index: UInt = 0
             for model in arrScreenShareParticipants {
                 if model.id == selfActiveTab.id {
                     selectedIndex = (index, model.id)
-                    return;
+                    return
                 }
                 index += 1
             }
         }
-        
+
         var index: UInt = 0
         for model in arrScreenShareParticipants {
             if model.id == oldId {
                 selectedIndex = (index, model.id)
-                return;
+                return
             }
             index += 1
         }
-        
-        
+
         if arrScreenShareParticipants.count >= 1 {
             selectedIndex = (0, arrScreenShareParticipants[0].id)
-        }else {
+        } else {
             selectedIndex = nil
         }
     }
 }
 
 public protocol ParticipantsShareControl {
-    var image: String? {get}
-    var name: String {get}
-    var id: String {get}
+    var image: String? { get }
+    var name: String { get }
+    var id: String { get }
 }
 
 public protocol PluginsButtonModelProtocol: ParticipantsShareControl {
-    var plugin: RtkPlugin {get}
+    var plugin: RtkPlugin { get }
 }
 
 public protocol ScreenSharePluginsProtocol: ParticipantsShareControl {
-    var participant: RtkMeetingParticipant {get}
+    var participant: RtkMeetingParticipant { get }
 }
-
 
 public class PluginButtonModel: PluginsButtonModelProtocol {
     public let image: String?
     public let name: String
     public let id: String
     public let plugin: RtkPlugin
-    
+
     public init(plugin: RtkPlugin) {
         self.plugin = plugin
-        self.id = plugin.id
-        self.image = plugin.picture
-        self.name = plugin.name
+        id = plugin.id
+        image = plugin.picture
+        name = plugin.name
     }
 }
 
-public class ScreenShareModel : ScreenSharePluginsProtocol {
+public class ScreenShareModel: ScreenSharePluginsProtocol {
     public let image: String?
     public let name: String
     public let id: String
@@ -196,18 +193,18 @@ public class ScreenShareModel : ScreenSharePluginsProtocol {
     public let participant: RtkMeetingParticipant
     public init(participant: RtkMeetingParticipant) {
         self.participant = participant
-        self.name = participant.name
-        self.image = participant.picture
-        self.id = participant.id
+        name = participant.name
+        image = participant.picture
+        id = participant.id
         let formatter = PersonNameComponentsFormatter()
         if let components = formatter.personNameComponents(from: participant.name) {
             formatter.style = .abbreviated
-            self.nameInitials = formatter.string(from: components)
-        }else {
+            nameInitials = formatter.string(from: components)
+        } else {
             if let first = name.first {
-                self.nameInitials = "\(first)"
-            }else {
-                self.nameInitials = ""
+                nameInitials = "\(first)"
+            } else {
+                nameInitials = ""
             }
         }
     }
@@ -215,14 +212,12 @@ public class ScreenShareModel : ScreenSharePluginsProtocol {
 
 var notificationDelegate: RtkNotificationDelegate?
 
-
 public final class MeetingViewModel {
-    
     private let rtkClient: RealtimeKitClient
     let selfEventListener: RtkEventSelfListener
     let maxParticipantOnpage: UInt
     let waitlistEventListener: RtkWaitListParticipantUpdateEventListener
-    
+
     weak var delegate: MeetingViewModelDelegate?
     var chatDelegate: ChatDelegate?
     var currentlyShowingItemOnSinglePage: UInt
@@ -230,127 +225,114 @@ public final class MeetingViewModel {
     let screenShareViewModel: ScreenShareViewModel
     var shouldShowShareScreen = false
     let rtkNotification = RtkNotification()
-    
+
     private let isDebugModeOn = RealtimeKitUI.isDebugModeOn
-    
+
     public init(rtkClient: RealtimeKitClient) {
         self.rtkClient = rtkClient
-        self.screenShareViewModel = ScreenShareViewModel(selfActiveTab: rtkClient.meta.selfActiveTab)
-        self.waitlistEventListener = RtkWaitListParticipantUpdateEventListener(rtkClient: rtkClient)
-        self.selfEventListener = RtkEventSelfListener(rtkClient: rtkClient)
-        self.maxParticipantOnpage = 9
-        self.currentlyShowingItemOnSinglePage = maxParticipantOnpage
+        screenShareViewModel = ScreenShareViewModel(selfActiveTab: rtkClient.meta.selfActiveTab)
+        waitlistEventListener = RtkWaitListParticipantUpdateEventListener(rtkClient: rtkClient)
+        selfEventListener = RtkEventSelfListener(rtkClient: rtkClient)
+        maxParticipantOnpage = 9
+        currentlyShowingItemOnSinglePage = maxParticipantOnpage
         initialise()
     }
-    
+
     public func clearChatNotification() {
         notificationDelegate?.clearChatNotification()
     }
-    
+
     func trackOnGoingState() {
-        
         if let participant = rtkClient.participants.pinned {
-            self.delegate?.pinnedChanged(participant: participant)
+            delegate?.pinnedChanged(participant: participant)
         }
-        
+
         if rtkClient.plugins.active.count >= 1 {
-            screenShareViewModel.refresh(plugins: self.rtkClient.plugins.active, selectedPlugin: nil)
-            
-            if self.rtkClient.participants.currentPageNumber == 0 {
-                self.delegate?.refreshPluginsScreenShareView()
+            screenShareViewModel.refresh(plugins: rtkClient.plugins.active, selectedPlugin: nil)
+
+            if rtkClient.participants.currentPageNumber == 0 {
+                delegate?.refreshPluginsScreenShareView()
             }
         }
-        
+
         if rtkClient.participants.screenShares.count > 0 {
             updateScreenShareStatus()
         }
     }
-    
+
     func onReconnect() {
         if rtkClient.participants.screenShares.count > 0 {
-            self.updateScreenShareStatus()
+            updateScreenShareStatus()
         }
         if rtkClient.plugins.active.count >= 1 {
-            screenShareViewModel.refresh(plugins: self.rtkClient.plugins.active, selectedPlugin: nil)
+            screenShareViewModel.refresh(plugins: rtkClient.plugins.active, selectedPlugin: nil)
         }
-        self.delegate?.refreshMeetingGrid()
+        delegate?.refreshMeetingGrid()
     }
-    
+
     func initialise() {
         rtkClient.addSelfEventListener(selfEventListener: self)
         rtkClient.addParticipantsEventListener(participantsEventListener: self)
         rtkClient.addPluginsEventListener(pluginsEventListener: self)
-        self.rtkClient.addPollsEventListener(pollsEventListener: self)
+        rtkClient.addPollsEventListener(pollsEventListener: self)
         rtkClient.addStageEventListener(stageEventListener: self)
     }
-    
+
     public func clean() {
         selfEventListener.clean()
         rtkClient.removeSelfEventListener(selfEventListener: self)
         rtkClient.removeParticipantsEventListener(participantsEventListener: self)
         rtkClient.removePluginsEventListener(pluginsEventListener: self)
-        self.rtkClient.removePollsEventListener(pollsEventListener: self)
+        rtkClient.removePollsEventListener(pollsEventListener: self)
         rtkClient.removeSelfEventListener(selfEventListener: self)
     }
-    
 }
 
 extension MeetingViewModel: RtkPollsEventListener {
-    public func onPollUpdate(poll: Poll) {
-        
-    }
-    
+    public func onPollUpdate(poll _: Poll) {}
+
     public func onNewPoll(poll: Poll) {
         delegate?.newPollAdded(createdBy: poll.createdBy)
         notificationDelegate?.didReceiveNotification(type: .Poll)
     }
-    
-    public func onPollUpdates(pollItems: [Poll]) {
-        
-    }
-    
-    
+
+    public func onPollUpdates(pollItems _: [Poll]) {}
 }
 
 extension MeetingViewModel {
-    
     public func refreshPinnedParticipants() {
-        refreshActiveParticipants(pageItemCount: self.currentlyShowingItemOnSinglePage)
+        refreshActiveParticipants(pageItemCount: currentlyShowingItemOnSinglePage)
     }
-    
+
     public func refreshActiveParticipants(pageItemCount: UInt = 0) {
-        //pageItemCount tell on first page how many tiles needs to be shown to user
-        self.updateActiveGridParticipants(pageItemCount: pageItemCount)
-        self.delegate?.refreshMeetingGrid()
+        // pageItemCount tell on first page how many tiles needs to be shown to user
+        updateActiveGridParticipants(pageItemCount: pageItemCount)
+        delegate?.refreshMeetingGrid()
     }
-    
+
     private func updateActiveGridParticipants(pageItemCount: UInt = 0) {
-        self.currentlyShowingItemOnSinglePage = pageItemCount
-        self.arrGridParticipants = getParticipant(pageItemCount: pageItemCount)
+        currentlyShowingItemOnSinglePage = pageItemCount
+        arrGridParticipants = getParticipant(pageItemCount: pageItemCount)
         if isDebugModeOn {
             print("Debug RtkUIKit | Current Visible Items \(arrGridParticipants.count)")
         }
     }
-    
+
     func pinOrPluginScreenShareModeIsActive() -> Bool {
-        return pinModeIsActive || pluginScreenShareModeIsActive()
+        pinModeIsActive || pluginScreenShareModeIsActive()
     }
-    
-    private var isAnyUserPinned : Bool {
-        get {
-            (self.rtkClient.participants.pinned != nil || self.rtkClient.localUser.isPinned) ? true : false
-        }
+
+    private var isAnyUserPinned: Bool {
+        (rtkClient.participants.pinned != nil || rtkClient.localUser.isPinned) ? true : false
     }
-    
-    var pinModeIsActive : Bool {
-        get {
-            self.rtkClient.participants.currentPageNumber == 0 && isAnyUserPinned
-        }
+
+    var pinModeIsActive: Bool {
+        rtkClient.participants.currentPageNumber == 0 && isAnyUserPinned
     }
-    
+
     func pluginScreenShareModeIsActive() -> Bool {
-        if self.rtkClient.participants.currentPageNumber == 0 {
-            let isScreenShareActive = self.rtkClient.participants.screenShares.count > 0 || self.rtkClient.localUser.screenShareEnabled
+        if rtkClient.participants.currentPageNumber == 0 {
+            let isScreenShareActive = rtkClient.participants.screenShares.count > 0 || rtkClient.localUser.screenShareEnabled
             if isScreenShareActive || rtkClient.plugins.active.count > 0 {
                 return true
             }
@@ -358,28 +340,28 @@ extension MeetingViewModel {
         }
         return false
     }
-    
+
     private func getParticipant(pageItemCount: UInt = 0) -> [GridCellViewModel] {
         let pluginScreenShareIsActive = pluginScreenShareModeIsActive()
-        
-        let showAddSelfToActive = (self.rtkClient.participants.currentPageNumber == 0 &&
-                                   self.rtkClient.localUser.stageStatus == .onStage)
+
+        let showAddSelfToActive = (rtkClient.participants.currentPageNumber == 0 &&
+            rtkClient.localUser.stageStatus == .onStage)
         let activeParticipants = if showAddSelfToActive {
-            self.rtkClient.participants.active + [self.rtkClient.localUser]
+            rtkClient.participants.active + [rtkClient.localUser]
         } else {
-            self.rtkClient.participants.active
+            rtkClient.participants.active
         }
-        
+
         if isDebugModeOn {
             print("Debug RtkUIKit | Active participant count \(activeParticipants.count)")
         }
-        
+
         let rowCount = (pageItemCount == 0 || pageItemCount >= activeParticipants.count) ? UInt(activeParticipants.count) : min(UInt(activeParticipants.count), pageItemCount)
         if isDebugModeOn {
             print("Debug RtkUIKit | visibleItemCount \(pageItemCount) MTVM RowCount \(rowCount)")
         }
         var itemCount = 0
-        var result =  [GridCellViewModel]()
+        var result = [GridCellViewModel]()
         for participant in activeParticipants {
             if itemCount < rowCount {
                 if pinOrPluginScreenShareModeIsActive() {
@@ -387,7 +369,7 @@ extension MeetingViewModel {
                         // we will show plugin view and if there is pinned participant it should be shown at 0 index inside grid
                         if participant.isPinned {
                             result.insert(GridCellViewModel(participant: participant), at: 0)
-                        }else {
+                        } else {
                             result.append(GridCellViewModel(participant: participant))
                         }
                     } else if pinModeIsActive {
@@ -401,7 +383,7 @@ extension MeetingViewModel {
                     result.append(GridCellViewModel(participant: participant))
                 }
             } else {
-                break;
+                break
             }
             itemCount += 1
         }
@@ -410,59 +392,50 @@ extension MeetingViewModel {
 }
 
 extension MeetingViewModel: RtkParticipantsEventListener {
-    public func onAllParticipantsUpdated(allParticipants: [RtkParticipant]) {
-        
-    }
-    
-    public func onAudioUpdate(participant: RtkRemoteParticipant,  isEnabled: Bool) {
-        
-    }
-    
-    public func onNewBroadcastMessage(type: String, payload: [String : Any]) {
-        
-    }
-    
-    public func onUpdate(participants: RtkParticipants) {
-        
-    }
-    
-    public func onVideoUpdate(participant: RtkRemoteParticipant,  isEnabled: Bool) {
-    }
-    
-    public func onScreenShareUpdate(participant: RtkRemoteParticipant,  isEnabled: Bool) {
+    public func onAllParticipantsUpdated(allParticipants _: [RtkParticipant]) {}
+
+    public func onAudioUpdate(participant _: RtkRemoteParticipant, isEnabled _: Bool) {}
+
+    public func onNewBroadcastMessage(type _: String, payload _: [String: Any]) {}
+
+    public func onUpdate(participants _: RtkParticipants) {}
+
+    public func onVideoUpdate(participant _: RtkRemoteParticipant, isEnabled _: Bool) {}
+
+    public func onScreenShareUpdate(participant: RtkRemoteParticipant, isEnabled: Bool) {
         if isEnabled {
             onScreenShareStarted(participant: participant)
         } else {
             onScreenShareEnded(participant: participant)
         }
     }
-    
+
     public func onScreenShareEnded(participant_ participant: RtkRemoteParticipant) {
         if isDebugModeOn {
             print("Debug RtkUIKit |onScreenShareEnded Participant Id \(participant.userId)")
         }
     }
-    
+
     public func onScreenShareStarted(participant_ participant: RtkRemoteParticipant) {
         if isDebugModeOn {
             print("Debug RtkUIKit | onScreenShareStarted Participant Id \(participant.userId)")
         }
     }
-    
+
     public func onScreenShareEnded(participant: RtkMeetingParticipant) {
         if isDebugModeOn {
             print("Debug RtkUIKit | onScreenShareEnded Participant Id \(participant.userId)")
         }
         updateScreenShareStatus()
     }
-    
+
     public func onScreenShareStarted(participant: RtkMeetingParticipant) {
         if isDebugModeOn {
             print("Debug RtkUIKit | onScreenShareStarted Participant Id \(participant.userId)")
         }
         updateScreenShareStatus()
     }
-    
+
     public func onParticipantLeave(participant: RtkRemoteParticipant) {
         if isDebugModeOn {
             print("Debug RtkUIKit | onParticipantLeave Participant Id \(participant.userId)")
@@ -470,219 +443,174 @@ extension MeetingViewModel: RtkParticipantsEventListener {
         delegate?.participantLeft(participant: participant)
         notificationDelegate?.didReceiveNotification(type: .Leave)
     }
-    
-    public func onActiveParticipantsChanged(active: [RtkRemoteParticipant]) {
+
+    public func onActiveParticipantsChanged(active _: [RtkRemoteParticipant]) {
         if isDebugModeOn {
             print("Debug RtkUIKit | onActiveParticipantsChanged")
         }
-        
-        self.refreshActiveParticipants(pageItemCount: self.currentlyShowingItemOnSinglePage)
+
+        refreshActiveParticipants(pageItemCount: currentlyShowingItemOnSinglePage)
     }
-    
+
     public func onActiveSpeakerChanged(participant: RtkRemoteParticipant?) {
-        if let participant = participant {
-            self.delegate?.activeSpeakerChanged(participant: participant)
+        if let participant {
+            delegate?.activeSpeakerChanged(participant: participant)
         }
     }
-    public  func onNoActiveSpeaker() {
-        self.delegate?.activeSpeakerRemoved()
-        
+
+    public func onNoActiveSpeaker() {
+        delegate?.activeSpeakerRemoved()
     }
-    
+
     public func onParticipantJoin(participant: RtkRemoteParticipant) {
         delegate?.participantJoined(participant: participant)
         notificationDelegate?.didReceiveNotification(type: .Joined)
         if isDebugModeOn {
-            print("Debug RtkUIKit | Delegate onParticipantJoin \(participant.audioEnabled) \(participant.name) totalCount \(self.rtkClient.participants.joined) participants")
+            print("Debug RtkUIKit | Delegate onParticipantJoin \(participant.audioEnabled) \(participant.name) totalCount \(rtkClient.participants.joined) participants")
         }
     }
-    
+
     public func onParticipantPinned(participant: RtkRemoteParticipant) {
-        
         if isDebugModeOn {
             print("Debug RtkUIKit | Pinned changed Participant Id \(participant.userId)")
         }
         refreshPinnedParticipants()
-        self.delegate?.pinnedChanged(participant: participant)
+        delegate?.pinnedChanged(participant: participant)
     }
-    
+
     public func onParticipantUnpinned(participant: RtkRemoteParticipant) {
         if isDebugModeOn {
             print("Debug RtkUIKit | Pinned removed Participant Id \(participant.userId)")
         }
         refreshPinnedParticipants()
     }
-    
+
     private func updateScreenShareStatus() {
         if isAnyUserPinned {
-            self.refreshPinnedParticipants()
+            refreshPinnedParticipants()
         }
-        
-        var screenshareParticipants : [RtkMeetingParticipant] = self.rtkClient.participants.screenShares
-        
-        let isSelfScreenshare = self.rtkClient.localUser.screenShareEnabled
-        
+
+        var screenshareParticipants: [RtkMeetingParticipant] = rtkClient.participants.screenShares
+
+        let isSelfScreenshare = rtkClient.localUser.screenShareEnabled
+
         if isSelfScreenshare {
-            screenshareParticipants.append(self.rtkClient.localUser)
+            screenshareParticipants.append(rtkClient.localUser)
         }
-        
+
         screenShareViewModel.refresh(participants: screenshareParticipants)
-        self.shouldShowShareScreen = screenShareViewModel.arrScreenShareParticipants.count > 0 ? true : false
-        if self.rtkClient.participants.currentPageNumber == 0 {
-            self.delegate?.refreshPluginsScreenShareView()
+        shouldShowShareScreen = screenShareViewModel.arrScreenShareParticipants.count > 0 ? true : false
+        if rtkClient.participants.currentPageNumber == 0 {
+            delegate?.refreshPluginsScreenShareView()
         }
     }
 }
 
 extension MeetingViewModel: RtkPluginsEventListener {
-    public func onPluginMessage(plugin: RtkPlugin, eventName: String, data: Any?) {
-        
-    }
-    
-    
+    public func onPluginMessage(plugin _: RtkPlugin, eventName _: String, data _: Any?) {}
+
     public func onPluginActivated(plugin: RtkPlugin) {
         if isDebugModeOn {
             print("Debug RtkUIKit | Delegate onPluginActivated(")
         }
         if isAnyUserPinned {
-            self.refreshPinnedParticipants()
+            refreshPinnedParticipants()
         }
-        screenShareViewModel.refresh(plugins: self.rtkClient.plugins.active, selectedPlugin: plugin)
-        if self.rtkClient.participants.currentPageNumber == 0 {
-            self.delegate?.refreshPluginsScreenShareView()
+        screenShareViewModel.refresh(plugins: rtkClient.plugins.active, selectedPlugin: plugin)
+        if rtkClient.participants.currentPageNumber == 0 {
+            delegate?.refreshPluginsScreenShareView()
         }
     }
-    
+
     public func onPluginDeactivated(plugin: RtkPlugin) {
         if isDebugModeOn {
             print("Debug RtkUIKit | Delegate onPluginDeactivated(")
         }
         if isAnyUserPinned {
-            self.refreshPinnedParticipants()
+            refreshPinnedParticipants()
         }
         screenShareViewModel.removed(plugin: plugin)
-        if self.rtkClient.participants.currentPageNumber == 0 {
-            self.delegate?.refreshPluginsScreenShareView()
+        if rtkClient.participants.currentPageNumber == 0 {
+            delegate?.refreshPluginsScreenShareView()
         }
     }
-    
-    public func onPluginFileRequest(plugin: RtkPlugin) {
-        
-    }
-    
-    public func onPluginMessage(message: [String : Kotlinx_serialization_jsonJsonElement]) {
+
+    public func onPluginFileRequest(plugin _: RtkPlugin) {}
+
+    public func onPluginMessage(message _: [String: Kotlinx_serialization_jsonJsonElement]) {
         if isDebugModeOn {
             print("Debug RtkUIKit | Delegate onPluginMessage(")
         }
     }
-    
 }
 
-extension MeetingViewModel : RtkSelfEventListener {
-    public func onAudioDevicesUpdated() {
-        
-    }
-    
-    public func onAudioUpdate(isEnabled: Bool) {
-        
-    }
-    
-    public func onMeetingRoomJoinedWithoutCameraPermission() {
-        
-    }
-    
-    public func onMeetingRoomJoinedWithoutMicPermission() {
-        
-    }
-    
-    public func onPermissionsUpdated(permission: SelfPermissions) {
-        
-    }
-    
+extension MeetingViewModel: RtkSelfEventListener {
+    public func onAudioDevicesUpdated() {}
+
+    public func onAudioUpdate(isEnabled _: Bool) {}
+
+    public func onMeetingRoomJoinedWithoutCameraPermission() {}
+
+    public func onMeetingRoomJoinedWithoutMicPermission() {}
+
+    public func onPermissionsUpdated(permission _: SelfPermissions) {}
+
     public func onPinned() {
         if isDebugModeOn {
-            print("Debug RtkUIKit | Pinned changed Participant Id \(self.rtkClient.localUser.id)")
+            print("Debug RtkUIKit | Pinned changed Participant Id \(rtkClient.localUser.id)")
         }
         refreshPinnedParticipants()
-        self.delegate?.pinnedChanged(participant: self.rtkClient.localUser)
+        delegate?.pinnedChanged(participant: rtkClient.localUser)
     }
-    
-    public func onRemovedFromMeeting() {
-        
-    }
-    
-    public func onScreenShareStartFailed(reason: String) {
-        
-    }
-    
+
+    public func onRemovedFromMeeting() {}
+
+    public func onScreenShareStartFailed(reason _: String) {}
+
     public func onScreenShareUpdate(isEnabled: Bool) {
         if isEnabled {
-            onScreenShareStarted(participant: self.rtkClient.localUser)
+            onScreenShareStarted(participant: rtkClient.localUser)
         } else {
-            onScreenShareEnded(participant: self.rtkClient.localUser)
+            onScreenShareEnded(participant: rtkClient.localUser)
         }
     }
-    
+
     public func onUnpinned() {
         if isDebugModeOn {
-            print("Debug RtkUIKit | Pinned removed self Participant Id \(self.rtkClient.localUser.id)")
+            print("Debug RtkUIKit | Pinned removed self Participant Id \(rtkClient.localUser.id)")
         }
         refreshPinnedParticipants()
+    }
 
-    }
-    
-    public func onUpdate(participant: RtkSelfParticipant) {
-        
-    }
-    
-    public func onVideoDeviceChanged(videoDevice: VideoDevice) {
-        
-    }
-    
-    public func onVideoUpdate(isEnabled: Bool) {
-        
-    }
-    
-    public func onWaitListStatusUpdate(waitListStatus: RealtimeKit.WaitListStatus) {
-        
-    }
-    
-    
+    public func onUpdate(participant _: RtkSelfParticipant) {}
+
+    public func onVideoDeviceChanged(videoDevice _: VideoDevice) {}
+
+    public func onVideoUpdate(isEnabled _: Bool) {}
+
+    public func onWaitListStatusUpdate(waitListStatus _: RealtimeKit.WaitListStatus) {}
 }
 
-extension MeetingViewModel : RtkStageEventListener {
-    public func onNewStageAccessRequest(participant: RtkRemoteParticipant) {
-        
-    }
-    
-    public func onPeerStageStatusUpdated(participant: RtkRemoteParticipant, oldStatus: RealtimeKit.StageStatus, newStatus: RealtimeKit.StageStatus) {
-        
-    }
-    
-    public func onRemovedFromStage() {
-        
-    }
-    
-    public func onStageAccessRequestAccepted() {
-        
-    }
-    
-    public func onStageAccessRequestRejected() {
-        
-    }
-    
-    public func onStageAccessRequestsUpdated(accessRequests: [RtkRemoteParticipant]) {
-        
-    }
-    
-    public func onStageStatusUpdated(oldStatus: RealtimeKit.StageStatus, newStatus: RealtimeKit.StageStatus) {
+extension MeetingViewModel: RtkStageEventListener {
+    public func onNewStageAccessRequest(participant _: RtkRemoteParticipant) {}
+
+    public func onPeerStageStatusUpdated(participant _: RtkRemoteParticipant, oldStatus _: RealtimeKit.StageStatus, newStatus _: RealtimeKit.StageStatus) {}
+
+    public func onRemovedFromStage() {}
+
+    public func onStageAccessRequestAccepted() {}
+
+    public func onStageAccessRequestRejected() {}
+
+    public func onStageAccessRequestsUpdated(accessRequests _: [RtkRemoteParticipant]) {}
+
+    public func onStageStatusUpdated(oldStatus _: RealtimeKit.StageStatus, newStatus: RealtimeKit.StageStatus) {
         if newStatus == .onStage || newStatus == .offStage {
             if isDebugModeOn {
                 print("Debug RtkUIKit | onStageStatusUpdated")
             }
-            
-            self.refreshActiveParticipants(pageItemCount: self.currentlyShowingItemOnSinglePage)
+
+            refreshActiveParticipants(pageItemCount: currentlyShowingItemOnSinglePage)
         }
     }
 }
-

@@ -8,35 +8,36 @@
 import RealtimeKit
 import UIKit
 
-public class RtkEventSelfListener  {
+public class RtkEventSelfListener {
     private static var currentInstance = 0
     public enum Reconnection {
         case start
         case success
         case failed
     }
-    private var selfAudioStateCompletion:((Bool)->Void)?
-    private var selfVideoStateCompletion:((Bool)->Void)?
-    private var selfObserveVideoStateCompletion:((Bool)->Void)?
-    private var selfObserveAudioStateCompletion:((Bool)->Void)?
-    
-    private var selfObserveWebinarStageStatus:((StageStatus)->Void)?
-    private var selfObserveRequestToJoinStage:(()->Void)?
-    private var observeSelfPermissionChanged:(()->Void)?
-    private var selfWebinarJoinedStateCompletion:((Bool)->Void)?
-    private var selfWebinarLeaveStateCompletion:((Bool)->Void)?
-    private var selfRequestToGetPermissionJoinedStateCompletion:((Bool)->Void)?
-    private var selfCancelRequestToGetPermissionToJoinStageCompletion:((Bool)->Void)?
-    private var selfMeetingInitStateCompletion:((Bool, String?)->Void)?
-    private var selfLeaveStateCompletion:((Bool)->Void)?
-    private var selfLeaveMeetingForAllCompletion:((Bool)->Void)?
-    private var selfEndMeetingForAllCompletion:((Bool)->Void)?
-    private var selfRemovedStateCompletion:((Bool)->Void)?
-    private var selfTabBarSyncStateCompletion:((String)->Void)?
-    private var selfObserveReconnectionStateCompletion:((Reconnection)->Void)?
-    
-    var waitListStatusUpdate:((WaitListStatus)->Void)?
-    
+
+    private var selfAudioStateCompletion: ((Bool) -> Void)?
+    private var selfVideoStateCompletion: ((Bool) -> Void)?
+    private var selfObserveVideoStateCompletion: ((Bool) -> Void)?
+    private var selfObserveAudioStateCompletion: ((Bool) -> Void)?
+
+    private var selfObserveWebinarStageStatus: ((StageStatus) -> Void)?
+    private var selfObserveRequestToJoinStage: (() -> Void)?
+    private var observeSelfPermissionChanged: (() -> Void)?
+    private var selfWebinarJoinedStateCompletion: ((Bool) -> Void)?
+    private var selfWebinarLeaveStateCompletion: ((Bool) -> Void)?
+    private var selfRequestToGetPermissionJoinedStateCompletion: ((Bool) -> Void)?
+    private var selfCancelRequestToGetPermissionToJoinStageCompletion: ((Bool) -> Void)?
+    private var selfMeetingInitStateCompletion: ((Bool, String?) -> Void)?
+    private var selfLeaveStateCompletion: ((Bool) -> Void)?
+    private var selfLeaveMeetingForAllCompletion: ((Bool) -> Void)?
+    private var selfEndMeetingForAllCompletion: ((Bool) -> Void)?
+    private var selfRemovedStateCompletion: ((Bool) -> Void)?
+    private var selfTabBarSyncStateCompletion: ((String) -> Void)?
+    private var selfObserveReconnectionStateCompletion: ((Reconnection) -> Void)?
+
+    var waitListStatusUpdate: ((WaitListStatus) -> Void)?
+
     var rtkClient: RealtimeKitClient
     let identifier: String
     public init(rtkClient: RealtimeKitClient, identifier: String = "Default") {
@@ -47,97 +48,96 @@ public class RtkEventSelfListener  {
         rtkClient.addStageEventListener(stageEventListener: self)
         Self.currentInstance += 1
     }
-    
+
     public func clean() {
         rtkClient.removeMeetingRoomEventListener(meetingRoomEventListener: self)
         rtkClient.removeSelfEventListener(selfEventListener: self)
         rtkClient.removeStageEventListener(stageEventListener: self)
     }
-    
+
     private let isDebugModeOn = RealtimeKitUI.isDebugModeOn
-    
-    public func toggleLocalAudio(completion: @escaping(_ isEnabled: Bool)->Void) {
-        self.selfAudioStateCompletion = completion
-        if self.rtkClient.localUser.audioEnabled == true {
-            self.rtkClient.localUser.disableAudio() {_ in }
+
+    public func toggleLocalAudio(completion: @escaping (_ isEnabled: Bool) -> Void) {
+        selfAudioStateCompletion = completion
+        if rtkClient.localUser.audioEnabled == true {
+            rtkClient.localUser.disableAudio { _ in }
         } else {
-            self.rtkClient.localUser.enableAudio { _ in }
+            rtkClient.localUser.enableAudio { _ in }
         }
     }
-    
-    public func observeSelfVideo(update:@escaping(_ enabled: Bool)->Void) {
+
+    public func observeSelfVideo(update: @escaping (_ enabled: Bool) -> Void) {
         selfObserveVideoStateCompletion = update
     }
-    
-    public func observeSelfAudio(update:@escaping(_ enabled: Bool)->Void) {
+
+    public func observeSelfAudio(update: @escaping (_ enabled: Bool) -> Void) {
         selfObserveAudioStateCompletion = update
     }
-    
-    public func observeSelfRemoved(update:((_ success: Bool)->Void)?) {
-        self.selfRemovedStateCompletion = update
+
+    public func observeSelfRemoved(update: ((_ success: Bool) -> Void)?) {
+        selfRemovedStateCompletion = update
     }
-    
-    public func observeSelfMeetingEndForAll(update:((_ success: Bool)->Void)?) {
-        self.selfEndMeetingForAllCompletion = update
+
+    public func observeSelfMeetingEndForAll(update: ((_ success: Bool) -> Void)?) {
+        selfEndMeetingForAllCompletion = update
     }
-    
-    public func observePluginScreenShareTabSync(update:((_ id: String)->Void)?) {
-        self.selfTabBarSyncStateCompletion = update
+
+    public func observePluginScreenShareTabSync(update: ((_ id: String) -> Void)?) {
+        selfTabBarSyncStateCompletion = update
     }
-    
-    public func observeMeetingReconnectionState(update: @escaping(_ state: Reconnection)-> Void) {
-        self.selfObserveReconnectionStateCompletion = update
+
+    public func observeMeetingReconnectionState(update: @escaping (_ state: Reconnection) -> Void) {
+        selfObserveReconnectionStateCompletion = update
     }
-    
-    public func toggleLocalVideo(completion: @escaping(_ isEnabled: Bool)->Void) {
-        self.selfVideoStateCompletion = completion
-        if self.rtkClient.localUser.videoEnabled == true {
-            self.rtkClient.localUser.disableVideo{_ in }
-        }else {
-            self.rtkClient.localUser.enableVideo { _ in }
+
+    public func toggleLocalVideo(completion: @escaping (_ isEnabled: Bool) -> Void) {
+        selfVideoStateCompletion = completion
+        if rtkClient.localUser.videoEnabled == true {
+            rtkClient.localUser.disableVideo { _ in }
+        } else {
+            rtkClient.localUser.enableVideo { _ in }
         }
     }
-    
+
     public func isCameraPermissionGranted(alertPresentingController: UIViewController? = RtkUIUtility.getTopViewController()) -> Bool {
-        if !self.rtkClient.localUser.isCameraPermissionGranted {
-            
+        if !rtkClient.localUser.isCameraPermissionGranted {
             if let alertContoller = alertPresentingController {
                 let alert = UIAlertController(title: "Camera", message: "Camera access is necessary to use this app.\n Please click settings to change the permission.", preferredStyle: .alert)
-                
-                alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
+
+                alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { _ in
                     // Handle cancel action if needed
                 }))
-                
-                alert.addAction(UIAlertAction(title: "Settings", style: .default, handler: { action in
+
+                alert.addAction(UIAlertAction(title: "Settings", style: .default, handler: { _ in
                     if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(settingsURL)
                     }
                 }))
-                
+
                 alertContoller.present(alert, animated: true, completion: nil)
             }
-            
+
             return false
         } else {
             return true
         }
     }
-    
-    public func isMicrophonePermissionGranted(alertPresentingController: UIViewController? = RtkUIUtility.getTopViewController() ) -> Bool {
-        if !self.rtkClient.localUser.isMicrophonePermissionGranted {
+
+    public func isMicrophonePermissionGranted(alertPresentingController: UIViewController? = RtkUIUtility.getTopViewController()) -> Bool {
+        if !rtkClient.localUser.isMicrophonePermissionGranted {
             if let alertController = alertPresentingController {
                 let alert = UIAlertController(title: "Microphone", message: "Microphone access is necessary to use this app.\n Please click settings to change the permission.", preferredStyle: .alert)
-                
-                alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
+
+                alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { _ in
                     // Handle cancel action if needed
                 }))
-                
-                alert.addAction(UIAlertAction(title: "Settings", style: .default, handler: { action in
+
+                alert.addAction(UIAlertAction(title: "Settings", style: .default, handler: { _ in
                     if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(settingsURL)
                     }
                 }))
-                
+
                 alertController.present(alert, animated: true, completion: nil)
             }
             return false
@@ -145,13 +145,13 @@ public class RtkEventSelfListener  {
             return true
         }
     }
-    
+
     func toggleCamera() {
         DispatchQueue.main.async {
             self.toggleCamera(rtkClient: self.rtkClient)
         }
     }
-    
+
     private func toggleCamera(rtkClient: RealtimeKitClient) {
         let videoDevices = rtkClient.localUser.getVideoDevices()
         if rtkClient.localUser.getSelectedVideoDevice()?.type == .front {
@@ -163,7 +163,7 @@ public class RtkEventSelfListener  {
                 rtkClient.localUser.setVideoDevice(rtkVideoDevice: device)
             }
         }
-        
+
         func getVideoDevice(type: VideoDeviceType) -> VideoDevice? {
             for device in videoDevices {
                 if device.type == type {
@@ -173,55 +173,55 @@ public class RtkEventSelfListener  {
             return nil
         }
     }
-    
-    func initMeetingV2(info: RtkMeetingInfo,completion:@escaping (_ success: Bool, _ message: String?) -> Void) {
-        self.selfMeetingInitStateCompletion = completion
-        self.rtkClient.doInit(meetingInfo: info, onSuccess: {}, onFailure: {_ in})
+
+    func initMeetingV2(info: RtkMeetingInfo, completion: @escaping (_ success: Bool, _ message: String?) -> Void) {
+        selfMeetingInitStateCompletion = completion
+        rtkClient.doInit(meetingInfo: info, onSuccess: {}, onFailure: { _ in })
     }
-    
-    func leaveMeeting(kickAll: Bool, completion:@escaping(_ success: Bool)->Void) {
+
+    func leaveMeeting(kickAll: Bool, completion: @escaping (_ success: Bool) -> Void) {
         if kickAll {
-            self.rtkClient.participants.kickAll()
-            self.selfLeaveMeetingForAllCompletion = completion
-        }else {
-            self.rtkClient.leaveRoom(onSuccess: {}, onFailure: {_ in})
-            self.selfLeaveStateCompletion = completion
+            rtkClient.participants.kickAll()
+            selfLeaveMeetingForAllCompletion = completion
+        } else {
+            rtkClient.leaveRoom(onSuccess: {}, onFailure: { _ in })
+            selfLeaveStateCompletion = completion
         }
     }
-    
-    func joinWebinarStage(completion:@escaping (_ success: Bool) -> Void) {
-        self.selfWebinarJoinedStateCompletion = completion
-        self.rtkClient.stage.join()
+
+    func joinWebinarStage(completion: @escaping (_ success: Bool) -> Void) {
+        selfWebinarJoinedStateCompletion = completion
+        rtkClient.stage.join()
     }
-    
-    func leaveWebinarStage(completion:@escaping (_ success: Bool) -> Void) {
-        self.selfWebinarLeaveStateCompletion = completion
-        self.rtkClient.stage.leave()
+
+    func leaveWebinarStage(completion: @escaping (_ success: Bool) -> Void) {
+        selfWebinarLeaveStateCompletion = completion
+        rtkClient.stage.leave()
     }
-    
-    func requestForPermissionToJoinWebinarStage(completion:@escaping (_ success: Bool) -> Void) {
-        self.selfRequestToGetPermissionJoinedStateCompletion = completion
-        self.rtkClient.stage.requestAccess()
+
+    func requestForPermissionToJoinWebinarStage(completion: @escaping (_ success: Bool) -> Void) {
+        selfRequestToGetPermissionJoinedStateCompletion = completion
+        rtkClient.stage.requestAccess()
     }
-    
-    func cancelRequestForPermissionToJoinWebinarStage(completion:@escaping (_ success: Bool) -> Void) {
-        self.selfCancelRequestToGetPermissionToJoinStageCompletion = completion
-        self.rtkClient.stage.cancelRequestAccess()
+
+    func cancelRequestForPermissionToJoinWebinarStage(completion: @escaping (_ success: Bool) -> Void) {
+        selfCancelRequestToGetPermissionToJoinStageCompletion = completion
+        rtkClient.stage.cancelRequestAccess()
     }
-    
-    public func observeWebinarStageStatus(update:@escaping(_ status: StageStatus)->Void) {
-        self.selfObserveWebinarStageStatus = update
+
+    public func observeWebinarStageStatus(update: @escaping (_ status: StageStatus) -> Void) {
+        selfObserveWebinarStageStatus = update
     }
-    
-    public func observeRequestToJoinStage(update:@escaping()->Void) {
-        self.selfObserveRequestToJoinStage = update
+
+    public func observeRequestToJoinStage(update: @escaping () -> Void) {
+        selfObserveRequestToJoinStage = update
     }
-    
-    public func observeSelfPermissionChanged(update:@escaping()->Void) {
-        self.observeSelfPermissionChanged = update
+
+    public func observeSelfPermissionChanged(update: @escaping () -> Void) {
+        observeSelfPermissionChanged = update
     }
-    
-    deinit{
+
+    deinit {
         Self.currentInstance -= 1
         if isDebugModeOn {
             print("RtkEventSelfListener deallocing identifier \(self.identifier) \(Self.currentInstance)")
@@ -230,137 +230,98 @@ public class RtkEventSelfListener  {
 }
 
 extension RtkEventSelfListener: RtkStageEventListener {
-    public func onNewStageAccessRequest(participant: RtkRemoteParticipant) {
-        
-    }
-    
-    public func onPeerStageStatusUpdated(participant: RtkRemoteParticipant, oldStatus: RealtimeKit.StageStatus, newStatus: RealtimeKit.StageStatus) {
-        
-    }
-    
+    public func onNewStageAccessRequest(participant _: RtkRemoteParticipant) {}
+
+    public func onPeerStageStatusUpdated(participant _: RtkRemoteParticipant, oldStatus _: RealtimeKit.StageStatus, newStatus _: RealtimeKit.StageStatus) {}
+
     public func onStageAccessRequestAccepted() {
-        //This is called when host allow me to join stage but its depends on user action whether he want to join or not.
-        if let update = self.selfObserveRequestToJoinStage {
+        // This is called when host allow me to join stage but its depends on user action whether he want to join or not.
+        if let update = selfObserveRequestToJoinStage {
             update()
         }
     }
-    
-    public func onStageAccessRequestRejected() {
-        
-    }
-    
-    public func onStageAccessRequestsUpdated(accessRequests: [RtkRemoteParticipant]) {
-        
-    }
-    
-    public func onStageStatusUpdated(oldStatus: RealtimeKit.StageStatus, newStatus: RealtimeKit.StageStatus) {
+
+    public func onStageAccessRequestRejected() {}
+
+    public func onStageAccessRequestsUpdated(accessRequests _: [RtkRemoteParticipant]) {}
+
+    public func onStageStatusUpdated(oldStatus _: RealtimeKit.StageStatus, newStatus: RealtimeKit.StageStatus) {
         if newStatus == .onStage {
-            self.selfWebinarJoinedStateCompletion?(true)
+            selfWebinarJoinedStateCompletion?(true)
         }
-        self.selfObserveWebinarStageStatus?(newStatus)
+        selfObserveWebinarStageStatus?(newStatus)
     }
-    
-    
+
     public func onAddedToStage() {
-        self.selfWebinarJoinedStateCompletion?(true)
+        selfWebinarJoinedStateCompletion?(true)
     }
-    
-    
-    private func onStageRequestWithdrawn(participant: RtkSelfParticipant) {
-        self.selfCancelRequestToGetPermissionToJoinStageCompletion?(true)
+
+    private func onStageRequestWithdrawn(participant _: RtkSelfParticipant) {
+        selfCancelRequestToGetPermissionToJoinStageCompletion?(true)
     }
-    
+
     public func onRemovedFromStage() {
-        self.selfWebinarLeaveStateCompletion?(true)
+        selfWebinarLeaveStateCompletion?(true)
     }
-    
-    public func onStageRequestsUpdated(accessRequests: [RtkRemoteParticipant]) {}
+
+    public func onStageRequestsUpdated(accessRequests _: [RtkRemoteParticipant]) {}
 }
 
 extension RtkEventSelfListener: RtkSelfEventListener {
-    public func onAudioDevicesUpdated() {
-        
+    public func onAudioDevicesUpdated() {}
+
+    public func onMeetingRoomJoinedWithoutCameraPermission() {}
+
+    public func onMeetingRoomJoinedWithoutMicPermission() {}
+
+    public func onPinned() {}
+
+    public func onScreenShareStartFailed(reason _: String) {}
+
+    public func onScreenShareUpdate(isEnabled _: Bool) {}
+
+    public func onUnpinned() {}
+
+    public func onUpdate(participant _: RtkSelfParticipant) {}
+
+    public func onVideoDeviceChanged(videoDevice _: VideoDevice) {}
+
+    public func onPermissionsUpdated(permission _: SelfPermissions) {
+        observeSelfPermissionChanged?()
     }
-    
-    public func onMeetingRoomJoinedWithoutCameraPermission() {
-        
+
+    public func onAudioUpdate(isEnabled: Bool) {
+        selfAudioStateCompletion?(isEnabled)
+        selfObserveAudioStateCompletion?(isEnabled)
     }
-    
-    public func onMeetingRoomJoinedWithoutMicPermission() {
-        
-    }
-    
-    public func onPinned() {
-        
-    }
-    
-    public func onScreenShareStartFailed(reason: String) {
-        
-    }
-    
-    public func onScreenShareUpdate(isEnabled: Bool) {
-        
-    }
-    
-    public func onUnpinned() {
-        
-    }
-    
-    public func onUpdate(participant: RtkSelfParticipant) {
-    }
-    
-    public func onVideoDeviceChanged(videoDevice: VideoDevice) {
-        
-    }
-    
-    public func onPermissionsUpdated(permission: SelfPermissions) {
-        self.observeSelfPermissionChanged?()
-    }
-    
-    public  func onAudioUpdate(isEnabled: Bool) {
-        self.selfAudioStateCompletion?(isEnabled)
-        self.selfObserveAudioStateCompletion?(isEnabled)
-    }
-    
+
     public func onRemovedFromMeeting() {
-        self.selfRemovedStateCompletion?(true)
+        selfRemovedStateCompletion?(true)
     }
-    
+
     public func onVideoUpdate(isEnabled: Bool) {
-        self.selfVideoStateCompletion?(isEnabled)
-        self.selfObserveVideoStateCompletion?(isEnabled)
+        selfVideoStateCompletion?(isEnabled)
+        selfObserveVideoStateCompletion?(isEnabled)
     }
-    
+
     public func onWaitListStatusUpdate(waitListStatus: WaitListStatus) {
-        self.waitListStatusUpdate?(waitListStatus)
+        waitListStatusUpdate?(waitListStatus)
     }
 }
 
-extension  RtkEventSelfListener: RtkMeetingRoomEventListener {
-    public func onMeetingInitStarted() {
-        
-    }
-    
-    public func onMeetingRoomJoinCompleted(meeting: RealtimeKitClient) {
-        
-    }
-    
-    public func onMeetingRoomJoinFailed(error: MeetingError) {
-        
-    }
-    
-    public func onMeetingRoomJoinStarted() {
-        
-    }
-    
-    public func onMeetingRoomLeaveStarted() {
-        
-    }
-    
-    public func onMediaConnectionUpdate(update: MediaConnectionUpdate) {
-        
-    }
-    
+extension RtkEventSelfListener: RtkMeetingRoomEventListener {
+    public func onMeetingInitStarted() {}
+
+    public func onMeetingRoomJoinCompleted(meeting _: RealtimeKitClient) {}
+
+    public func onMeetingRoomJoinFailed(error _: MeetingError) {}
+
+    public func onMeetingRoomJoinStarted() {}
+
+    public func onMeetingRoomLeaveStarted() {}
+
+    public func onMediaConnectionUpdate(update _: MediaConnectionUpdate) {}
+
     public func onSocketConnectionUpdate(newState: SocketConnectionState) {
         switch newState.socketState {
         case .connected:
@@ -373,58 +334,56 @@ extension  RtkEventSelfListener: RtkMeetingRoomEventListener {
             break
         }
     }
-    
+
     private func onMeetingRoomReconnectionFailed() {
         if isDebugModeOn {
             print("Debug RtkUIKit | RtkEventSelfListener \(Self.currentInstance)  onMeetingRoomReconnectionFailed")
         }
-        self.selfObserveReconnectionStateCompletion?(.failed)
+        selfObserveReconnectionStateCompletion?(.failed)
     }
-    
+
     private func onReconnectedToMeetingRoom() {
         if isDebugModeOn {
             print("Debug RtkUIKit | RtkEventSelfListener \(Self.currentInstance)  onReconnectedToMeetingRoom")
         }
-        
-        self.selfObserveReconnectionStateCompletion?(.success)
+
+        selfObserveReconnectionStateCompletion?(.success)
     }
-    
+
     private func onReconnectingToMeetingRoom() {
         if isDebugModeOn {
             print("Debug RtkUIKit | RtkEventSelfListener \(Self.currentInstance) onReconnectingToMeetingRoom")
         }
-        
-        self.selfObserveReconnectionStateCompletion?(.start)
+
+        selfObserveReconnectionStateCompletion?(.start)
     }
-    
-    public func onActiveTabUpdate(meeting: RealtimeKitClient, activeTab: ActiveTab) {
-        self.selfTabBarSyncStateCompletion?(activeTab.id)
+
+    public func onActiveTabUpdate(meeting _: RealtimeKitClient, activeTab: ActiveTab) {
+        selfTabBarSyncStateCompletion?(activeTab.id)
     }
-    
+
     public func onMeetingEnded() {
-        if let completion = self.selfLeaveMeetingForAllCompletion {
+        if let completion = selfLeaveMeetingForAllCompletion {
             completion(true)
         }
-        
-        if let completion = self.selfEndMeetingForAllCompletion {
+
+        if let completion = selfEndMeetingForAllCompletion {
             completion(true)
         }
     }
-    
-    public func onMeetingInitCompleted(meeting: RealtimeKitClient) {
+
+    public func onMeetingInitCompleted(meeting _: RealtimeKitClient) {
         rtkClient.setUiKitInfo(name: "ios-ui-kit", version: Constants.sdkVersion)
-        self.selfMeetingInitStateCompletion?(true, "")
+        selfMeetingInitStateCompletion?(true, "")
     }
-    
-    public  func onMeetingInitFailed(error: MeetingError) {
-        self.selfMeetingInitStateCompletion?(false, error.message)
+
+    public func onMeetingInitFailed(error: MeetingError) {
+        selfMeetingInitStateCompletion?(false, error.message)
     }
-    
+
     public func onMeetingRoomLeaveCompleted() {
-        if let completion = self.selfLeaveStateCompletion {
+        if let completion = selfLeaveStateCompletion {
             completion(true)
         }
     }
 }
-
-

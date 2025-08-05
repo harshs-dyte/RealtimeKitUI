@@ -21,53 +21,49 @@ protocol PollDelegate {
     func refreshPolls(pollMessages: [Poll])
 }
 
-
 protocol ParticipantsDelegate {
     func refreshList()
 }
 
 final class SetupViewModel {
-    
     let rtkClient: RealtimeKitClient
-   
-    private var roomJoined:((Bool)->Void)?
+
+    private var roomJoined: ((Bool) -> Void)?
     private weak var delegate: MeetingDelegate?
 
-    var participantsDelegate : ParticipantsDelegate?
+    var participantsDelegate: ParticipantsDelegate?
     var participants = [RtkMeetingParticipant]()
     var screenshares = [RtkMeetingParticipant]()
-    
+
     let meetingInfo: RtkMeetingInfo
     let rtkSelfListener: RtkEventSelfListener
-    
+
     init(rtkClient: RealtimeKitClient, delegate: MeetingDelegate?, meetingInfo: RtkMeetingInfo) {
         self.rtkClient = rtkClient
         self.delegate = delegate
         self.meetingInfo = meetingInfo
-        self.rtkSelfListener = RtkEventSelfListener(rtkClient: rtkClient)
+        rtkSelfListener = RtkEventSelfListener(rtkClient: rtkClient)
         initialise()
     }
-    
+
     func initialise() {
         let info = meetingInfo
         rtkSelfListener.initMeetingV2(info: info) { [weak self] success, message in
-                guard let self = self else {return}
+            guard let self else { return }
 
-                if success {
-                    self.delegate?.onMeetingInitCompleted()
-                }else {
-                    self.delegate?.onMeetingInitFailed(message: message)
-                }
+            if success {
+                delegate?.onMeetingInitCompleted()
+            } else {
+                delegate?.onMeetingInitFailed(message: message)
             }
+        }
     }
 
     func removeListener() {
         rtkSelfListener.clean()
     }
-    
+
     deinit {
         print("SetupView Model dealloc is calling")
     }
 }
-
-

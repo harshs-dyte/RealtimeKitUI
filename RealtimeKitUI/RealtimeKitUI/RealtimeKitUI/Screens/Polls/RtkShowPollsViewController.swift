@@ -1,23 +1,24 @@
 //
-//  ShowPollsViewController.swift
+//  RtkShowPollsViewController.swift
 //  RealtimeKitUI
 //
 //  Created by sudhir kumar on 24/01/23.
 //
 
-import UIKit
 import RealtimeKit
+import UIKit
 
 class SelectionProgressView: UIView {
     let borderRadiusType: BorderRadiusToken.RadiusType = AppTheme.shared.cornerRadiusTypeNameTextField ?? .rounded
 
     let spaceToken = DesignLibrary.shared.space
-    let imageView:BaseImageView = {
+    let imageView: BaseImageView = {
         let imageView = BaseImageView()
         imageView.setContentCompressionResistancePriority(.required, for: .horizontal)
         return imageView
-        
+
     }()
+
     let title: RtkLabel = {
         let label = RtkUIUtility.createLabel(alignment: .left)
         label.numberOfLines = 0
@@ -25,60 +26,61 @@ class SelectionProgressView: UIView {
         label.font = UIFont.systemFont(ofSize: 12)
         return label
     }()
-    
+
     let progressTitle: RtkLabel = {
         let label = RtkUIUtility.createLabel(alignment: .right)
         label.font = UIFont.systemFont(ofSize: 12)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
         return label
     }()
-    
+
     private var progressBaseView: UIView = {
         let view = UIView()
         view.backgroundColor = DesignLibrary.shared.color.background.shade600
         return view
-    } ()
+    }()
+
     private var progressView: UIView = {
         let view = UIView()
         view.backgroundColor = DesignLibrary.shared.color.brand.shade500
         return view
-    } ()
-    
+    }()
+
     private let radioImage: RadioTypeImage
     var index: Int = 0
-    private var clickAction: (SelectionProgressView)->Void
-    
-    init(radioImage: RadioTypeImage, title: String, onClick:@escaping(SelectionProgressView)->Void) {
+    private var clickAction: (SelectionProgressView) -> Void
+
+    init(radioImage: RadioTypeImage, title: String, onClick: @escaping (SelectionProgressView) -> Void) {
         self.radioImage = radioImage
         self.title.text = title
-        self.clickAction = onClick
+        clickAction = onClick
         super.init(frame: .zero)
         createSubView()
-        self.setSelected(selected: false)
+        setSelected(selected: false)
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func createSubView() {
-        self.addSubview(imageView)
-        self.addSubview(progressBaseView)
-        
+        addSubview(imageView)
+        addSubview(progressBaseView)
+
         progressBaseView.addSubview(progressView)
         progressBaseView.addSubview(title)
         progressBaseView.addSubview(progressTitle)
         progressBaseView.layer.cornerRadius = DesignLibrary.shared.borderRadius.getRadius(size: .one, radius: borderRadiusType)
         progressBaseView.layer.masksToBounds = true
-        
-        
+
         imageView.set(.leading(self),
-                      .top(self, 0.0 , .greaterThanOrEqual),
+                      .top(self, 0.0, .greaterThanOrEqual),
                       .centerY(self))
-        
-        progressBaseView.set(.after(imageView,spaceToken.space2),
-                  .sameTopBottom(self),
-                  .trailing(self))
+
+        progressBaseView.set(.after(imageView, spaceToken.space2),
+                             .sameTopBottom(self),
+                             .trailing(self))
         progressView.set(.sameTopBottom(progressBaseView),
                          .leading(progressBaseView),
                          .width(0),
@@ -90,38 +92,37 @@ class SelectionProgressView: UIView {
                           .after(title, spaceToken.space2, .greaterThanOrEqual),
                           .trailing(progressBaseView, spaceToken.space2))
     }
-    
+
     var isSelected: Bool = false {
         didSet {
-            self.setSelected(selected: isSelected)
+            setSelected(selected: isSelected)
         }
     }
-    
+
     func setProgressTitle(text: String?) {
         progressTitle.text = text
     }
-    
+
     func showProgress(percentage: CGFloat) {
-        if percentage >= 0 && percentage <= 1 {
+        if percentage >= 0, percentage <= 1 {
             let width = progressBaseView.frame.width * percentage
             progressView.get(.width)?.constant = width
         }
     }
-    
+
     private func setSelected(selected: Bool) {
         if selected == true {
-            self.imageView.setImage(image: self.radioImage.selectedImage)
-        }else {
-            self.imageView.setImage(image: self.radioImage.normalImage)
+            imageView.setImage(image: radioImage.selectedImage)
+        } else {
+            imageView.setImage(image: radioImage.normalImage)
         }
     }
-    
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         clickAction(self)
     }
 }
-
 
 class PollCardModel {
     let posterName: String
@@ -138,7 +139,6 @@ class PollCardModel {
         self.leftButton = leftButton
         self.rightButton = rightButton
     }
-
 }
 
 class ListProgressSelectionViewModel {
@@ -151,7 +151,7 @@ class ListProgressSelectionViewModel {
         self.title = title
         self.leftSubTitle = leftSubTitle
         self.rightSubTitle = rightSubTitle
-        self.list = selectionList
+        list = selectionList
         self.isTouchable = isTouchable
     }
 }
@@ -159,20 +159,22 @@ class ListProgressSelectionViewModel {
 class ListProgressSelectionView: UIView {
     let spaceToken = DesignLibrary.shared.space
     private let model: ListProgressSelectionViewModel
-    
-    var onSelectView:((Int)->Void)?
-    
+
+    var onSelectView: ((Int) -> Void)?
+
     let titleLabel: RtkLabel = {
         let label = RtkUIUtility.createLabel(alignment: .left)
         label.numberOfLines = 0
         label.font = UIFont.systemFont(ofSize: 14)
         return label
     }()
+
     let leftSubTitleLabel: RtkLabel = {
         let label = RtkUIUtility.createLabel(alignment: .left)
         label.font = UIFont.systemFont(ofSize: 12)
         return label
     }()
+
     let rightSubTitleLabel: RtkLabel = {
         let label = RtkUIUtility.createLabel(alignment: .left)
         label.font = UIFont.systemFont(ofSize: 12)
@@ -185,41 +187,42 @@ class ListProgressSelectionView: UIView {
     private let stackViewSelectionView: UIStackView
 
     private var arrSelectionView = [SelectionProgressView]()
-    
+
     init(model: ListProgressSelectionViewModel) {
         self.model = model
         stackView = RtkUIUtility.createStackView(axis: .vertical, spacing: spaceToken.space4)
         stackViewSubtitle = RtkUIUtility.createStackView(axis: .horizontal, spacing: spaceToken.space2)
         stackViewSelectionView = RtkUIUtility.createStackView(axis: .vertical, spacing: spaceToken.space2)
-        
+
         super.init(frame: .zero)
         titleLabel.text = model.title
         leftSubTitleLabel.text = model.leftSubTitle
         rightSubTitleLabel.text = model.rightSubTitle
-        self.isUserInteractionEnabled = model.isTouchable
+        isUserInteractionEnabled = model.isTouchable
         createSubView()
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func createSubView() {
-        self.addSubview(stackView)
+        addSubview(stackView)
         stackView.set(.fillSuperView(self))
-        self.arrSelectionView = createListView(on: stackViewSelectionView)
-        stackViewSubtitle.addArrangedSubviews(leftSubTitleLabel,rightSubTitleLabel)
+        arrSelectionView = createListView(on: stackViewSelectionView)
+        stackViewSubtitle.addArrangedSubviews(leftSubTitleLabel, rightSubTitleLabel)
 
         let stackViewSubTitleSelectionView = RtkUIUtility.createStackView(axis: .vertical, spacing: spaceToken.space3)
-        stackViewSubTitleSelectionView.addArrangedSubviews(stackViewSubtitle,stackViewSelectionView)
-        stackView.addArrangedSubviews(titleLabel,stackViewSubTitleSelectionView)
+        stackViewSubTitleSelectionView.addArrangedSubviews(stackViewSubtitle, stackViewSelectionView)
+        stackView.addArrangedSubviews(titleLabel, stackViewSubTitleSelectionView)
     }
-    
+
     private func createListView(on stackView: UIStackView) -> [SelectionProgressView] {
         var arrResult = [SelectionProgressView]()
         var index = 0
         for model in model.list {
-            let view = self.get(image: model.image, title: model.title, rightTitle: model.rightTitle, isSelected: model.isSelected)
+            let view = get(image: model.image, title: model.title, rightTitle: model.rightTitle, isSelected: model.isSelected)
             view.index = index
             stackView.addArrangedSubview(view)
             arrResult.append(view)
@@ -227,32 +230,32 @@ class ListProgressSelectionView: UIView {
         }
         return arrResult
     }
-    
+
     private func get(image: RadioTypeImage, title: String, rightTitle: String?, isSelected: Bool) -> SelectionProgressView {
-        let view  = SelectionProgressView(radioImage: image, title: title) { [weak self] selectionView in
-            guard let self = self else { return }
-            self.selectView(          at: selectionView.index)
-            self.onSelectView?(selectionView.index)
+        let view = SelectionProgressView(radioImage: image, title: title) { [weak self] selectionView in
+            guard let self else { return }
+            selectView(at: selectionView.index)
+            onSelectView?(selectionView.index)
         }
         view.isSelected = isSelected
         view.setProgressTitle(text: rightTitle)
         return view
     }
-    
+
     private func selectView(at index: Int) {
         var key = 0
         for view in arrSelectionView {
             if key == index {
                 view.isSelected = true
-            }else {
+            } else {
                 view.isSelected = false
             }
             key += 1
         }
     }
-    
-   public func getCurrentSelectedIndex() -> Int? {
-        var index: Int = 0
+
+    func getCurrentSelectedIndex() -> Int? {
+        var index = 0
         for view in arrSelectionView {
             if view.isSelected == true {
                 return index
@@ -263,92 +266,90 @@ class ListProgressSelectionView: UIView {
     }
 }
 
-
 class ShowPolls: UIView {
     let spaceToken = DesignLibrary.shared.space
-    let imageView:BaseImageView = { return BaseImageView()}()
-    
+    let imageView: BaseImageView = .init()
+
     let borderRadiusType: BorderRadiusToken.RadiusType = AppTheme.shared.cornerRadiusTypeCreateView ?? .rounded
 
     let backGroundColor = DesignLibrary.shared.color.background.shade900
- 
+
     let lblTitle: RtkLabel = {
         let label = RtkUIUtility.createLabel(alignment: .left)
         label.numberOfLines = 0
         label.font = UIFont.boldSystemFont(ofSize: 12)
         return label
     }()
-    
+
     let lblTime: RtkLabel = {
         let label = RtkUIUtility.createLabel(alignment: .left)
         label.numberOfLines = 0
         label.font = UIFont.systemFont(ofSize: 12)
         return label
     }()
-    
+
     let baseView = UIView()
     let separatorView = {
         let view = UIView()
         view.backgroundColor = .gray
         return view
     }()
-    
+
     let bottomLeftButton: UIButton?
     let bottomRightButton: UIButton?
-    
+
     let listSelectionView: ListProgressSelectionView
-    
-    init(leftTitle: String, rightTitle:String?, bottomLeftButton: UIButton?, bottomRightButton: UIButton?, listSelectionView: ListProgressSelectionView) {
+
+    init(leftTitle: String, rightTitle: String?, bottomLeftButton: UIButton?, bottomRightButton: UIButton?, listSelectionView: ListProgressSelectionView) {
         self.bottomLeftButton = bottomLeftButton
         self.bottomRightButton = bottomRightButton
         self.listSelectionView = listSelectionView
         super.init(frame: .zero)
-        self.lblTitle.text = leftTitle
-        self.lblTime.text = rightTitle
+        lblTitle.text = leftTitle
+        lblTime.text = rightTitle
         setUpView()
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func setUpView() {
         createSubView()
         baseView.backgroundColor = backGroundColor
         baseView.layer.cornerRadius = DesignLibrary.shared.borderRadius.getRadius(size: .one, radius: borderRadiusType)
         baseView.layer.masksToBounds = true
     }
-    
-    
-    
-   private func createSubView() {
-        self.addSubview(lblTitle)
-        self.addSubview(lblTime)
-        self.addSubview(baseView)
-        
-       baseView.addSubview(listSelectionView)
-       baseView.addSubview(separatorView)
 
-       baseView.layer.cornerRadius = 8.0
-       baseView.clipsToBounds = true
-       baseView.layer.masksToBounds = true
-       
+    private func createSubView() {
+        addSubview(lblTitle)
+        addSubview(lblTime)
+        addSubview(baseView)
+
+        baseView.addSubview(listSelectionView)
+        baseView.addSubview(separatorView)
+
+        baseView.layer.cornerRadius = 8.0
+        baseView.clipsToBounds = true
+        baseView.layer.masksToBounds = true
+
         lblTitle.set(.top(self),
                      .leading(self))
         lblTime.set(.centerY(lblTitle),
-                    .after(lblTitle, spaceToken.space4)
-                    ,.trailing(self, 0.0, .greaterThanOrEqual))
+                    .after(lblTitle, spaceToken.space4),
+                    .trailing(self, 0.0, .greaterThanOrEqual))
         baseView.set(.below(lblTitle, spaceToken.space2),
                      .sameLeadingTrailing(self), .bottom(self))
         listSelectionView.set(.top(baseView, spaceToken.space4),
                               .sameLeadingTrailing(baseView, spaceToken.space4))
-        
+
         separatorView.set(.below(listSelectionView, spaceToken.space4),
                           .sameLeadingTrailing(baseView),
                           .height(1))
         createBottomButtonView()
     }
-    
+
     private func createBottomButtonView() {
         let buttonBaseView = UIView()
         baseView.addSubview(buttonBaseView)
@@ -364,59 +365,55 @@ class ShowPolls: UIView {
             if let button = bottomRightButton {
                 buttonBaseView.addSubview(button)
                 button.set(.top(buttonBaseView, spaceToken.space4, .greaterThanOrEqual),
-                           .bottom(buttonBaseView,spaceToken.space4),
+                           .bottom(buttonBaseView, spaceToken.space4),
                            .trailing(buttonBaseView, spaceToken.space4))
             }
-        }else {
+        } else {
             separatorView.get(.height)?.constant = 0.0
         }
     }
 }
 
-
 class ShowPollsViewModel {
-    
     let rtkClient: RealtimeKitClient
-    var refreshPolls: (([PollCardModel], Bool)->Void)?
+    var refreshPolls: (([PollCardModel], Bool) -> Void)?
 
     init(rtkClient: RealtimeKitClient) {
         self.rtkClient = rtkClient
         self.rtkClient.addPollsEventListener(pollsEventListener: self)
     }
-    
+
     var canShowCreateButton: Bool {
-        self.rtkClient.localUser.permissions.polls.canCreate
+        rtkClient.localUser.permissions.polls.canCreate
     }
-    
+
     func refresh(onNewCreated: Bool = false) {
-        let polls =  self.rtkClient.polls
-        let cardModels = self.parse(polls: polls.items)
-        self.refreshPolls?(cardModels, onNewCreated)
+        let polls = rtkClient.polls
+        let cardModels = parse(polls: polls.items)
+        refreshPolls?(cardModels, onNewCreated)
     }
-    
+
     func parse(polls: [Poll]) -> [PollCardModel] {
         var result = [PollCardModel]()
-        let userId = self.rtkClient.localUser.userId
+        let userId = rtkClient.localUser.userId
         let selectedImage = RtkImage(image: ImageProvider.image(named: "icon_radiobutton_selected"))
         let unSelectedImage = RtkImage(image: ImageProvider.image(named: "icon_radiobutton_unselected"))
 
         for poll in polls {
-            
-            var model =  [(image: RadioTypeImage, title: String, rightTitle: String?, isSelected: Bool)]()
-            let _ = self.rtkClient.participants.joined.count
+            var model = [(image: RadioTypeImage, title: String, rightTitle: String?, isSelected: Bool)]()
+            _ = rtkClient.participants.joined.count
 
             var showVoteButton = true
             for option in poll.options {
-
                 var isVoted = false
-                option.votes.forEach { votee in
+                for votee in option.votes {
                     if votee.id == userId {
                         isVoted = true
                         showVoteButton = false
                     }
                 }
                 var percentageTitle: String? = nil
-                
+
                 if poll.hideVotes == false || isVoted {
                     percentageTitle = "(\(option.votes.count))"
                 }
@@ -433,32 +430,30 @@ class ShowPollsViewModel {
         }
         return result
     }
-    
 }
+
 extension ShowPollsViewModel: RtkPollsEventListener {
-    func onPollUpdate(poll: Poll) {
-        
-    }
-    
-    func onNewPoll(poll: Poll) {
+    func onPollUpdate(poll _: Poll) {}
+
+    func onNewPoll(poll _: Poll) {
         notificationDelegate?.didReceiveNotification(type: .Poll)
         refresh(onNewCreated: true)
     }
-    
-    func onPollUpdates(pollItems: [Poll]) {
+
+    func onPollUpdates(pollItems _: [Poll]) {
         refresh()
     }
 }
 
-public class RtkShowPollsViewController: UIViewController , SetTopbar {
+public class RtkShowPollsViewController: UIViewController, SetTopbar {
     public var shouldShowTopBar: Bool = true
-    
+
     public let topBar: RtkNavigationBar = {
         let topBar = RtkNavigationBar(title: "Polls")
         return topBar
     }()
-    
-    let scrollView:UIScrollView = {return UIScrollView()}()
+
+    let scrollView: UIScrollView = .init()
     let spaceToken = DesignLibrary.shared.space
     let viewModel: ShowPollsViewModel
     let rtkClient: RealtimeKitClient
@@ -471,55 +466,56 @@ public class RtkShowPollsViewController: UIViewController , SetTopbar {
         label.isHidden = true
         return label
     }()
-    
+
     let indicatorView: BaseIndicatorView = {
         let indicatorView = BaseIndicatorView.createIndicatorView()
         indicatorView.indicatorView.color = .white
         indicatorView.indicatorView.startAnimating()
         return indicatorView
     }()
-    
-    public override func viewSafeAreaInsetsDidChange() {
+
+    override public func viewSafeAreaInsetsDidChange() {
         super.viewSafeAreaInsetsDidChange()
-        topBar.set(.top(self.view, self.view.safeAreaInsets.top))
+        topBar.set(.top(view, view.safeAreaInsets.top))
     }
-    
+
     public init(meeting: RealtimeKitClient) {
-        self.viewModel = ShowPollsViewModel(rtkClient: meeting)
-        self.rtkClient = meeting
+        viewModel = ShowPollsViewModel(rtkClient: meeting)
+        rtkClient = meeting
         super.init(nibName: nil, bundle: nil)
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    public override func viewDidLoad() {
+
+    override public func viewDidLoad() {
         super.viewDidLoad()
-        self.view.accessibilityIdentifier = "Show_Existing_Polls_Screen"
+        view.accessibilityIdentifier = "Show_Existing_Polls_Screen"
         setUpView()
     }
-    
-    public override func viewDidAppear(_ animated: Bool) {
+
+    override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        self.viewModel.refresh(onNewCreated: true)
+        viewModel.refresh(onNewCreated: true)
     }
-    
+
     private func setUpView() {
-        self.addTopBar(dismissAnimation: true)
-        createSubView(on: self.view)
-        self.view.backgroundColor = viewBackGroundColor
-       
-        self.viewModel.refreshPolls = { [weak self] cardModels, newCreatedPoll in
-            guard let self = self else {return}
-            
-            self.reloadUI(cardModels: cardModels, newlyAddedPoll: newCreatedPoll)
+        addTopBar(dismissAnimation: true)
+        createSubView(on: view)
+        view.backgroundColor = viewBackGroundColor
+
+        viewModel.refreshPolls = { [weak self] cardModels, newCreatedPoll in
+            guard let self else { return }
+
+            reloadUI(cardModels: cardModels, newlyAddedPoll: newCreatedPoll)
         }
     }
-    
+
     private func reloadUI(cardModels: [PollCardModel], newlyAddedPoll: Bool) {
         let previousY = scrollView.contentOffset.y
-        scrollView.subviews.forEach { subView in
+        for subView in scrollView.subviews {
             subView.removeFromSuperview()
             subView.removeConstraints(subView.constraints)
         }
@@ -527,81 +523,80 @@ public class RtkShowPollsViewController: UIViewController , SetTopbar {
         lblNoPollExist.isHidden = cardModels.count > 0 ? true : false
 
         if cardModels.count > 0 {
-            let view = self.createShowPollResultView(pollsModel: cardModels)
+            let view = createShowPollResultView(pollsModel: cardModels)
             view.accessibilityIdentifier = "Polls_View"
             scrollView.addSubview(view)
             view.set(.fillSuperView(scrollView))
             scrollView.set(.equateAttribute(.width, toView: view, toAttribute: .width, withRelation: .equal))
         }
-        self.view.layoutIfNeeded()
+        view.layoutIfNeeded()
         if newlyAddedPoll {
             if scrollView.contentSize.height > scrollView.frame.height {
                 let y = scrollView.contentSize.height - scrollView.frame.height
                 scrollView.setContentOffset(CGPoint(x: 0, y: y), animated: true)
             }
-        }else {
+        } else {
             scrollView.setContentOffset(CGPoint(x: 0, y: previousY), animated: false)
         }
     }
-    
+
     private func createSubView(on view: UIView) {
         view.addSubview(scrollView)
         view.addSubview(lblNoPollExist)
         view.addSubview(indicatorView)
         indicatorView.set(.centerView(view), .size(CGSize(width: 50, height: 50)))
         lblNoPollExist.set(.centerView(view), .leading(view, spaceToken.space5))
-       
+
         let createButton = RtkButton(style: .solid)
         createButton.setTitle(" Create Poll ", for: .normal)
         self.view.addSubview(createButton)
         createButton.set(.centerX(self.view),
                          .leading(self.view, spaceToken.space4),
-                         .bottom(self.view,spaceToken.space8))
-        if self.viewModel.canShowCreateButton == false {
+                         .bottom(self.view, spaceToken.space8))
+        if viewModel.canShowCreateButton == false {
             createButton.set(.height(0))
         }
         createButton.accessibilityIdentifier = "Create_Polls_Button"
         createButton.addTarget(self, action: #selector(createPollClick(button:)), for: .touchUpInside)
-        
-        scrollView.set(.sameLeadingTrailing(view,spaceToken.space3),
+
+        scrollView.set(.sameLeadingTrailing(view, spaceToken.space3),
                        .below(topBar, spaceToken.space2),
                        .above(createButton, spaceToken.space4))
-        
     }
-    
-    private var creatPollController: RtkCreatePollsViewController? = nil
-   
-    @objc func createPollClick(button: RtkButton) {
-        let controller = RtkCreatePollsViewController(rtkClient: rtkClient) { [weak self] result in
-            guard let self = self else {return}
-            self.creatPollController?.view.removeFromSuperview()
-            self.creatPollController = nil
+
+    private var creatPollController: RtkCreatePollsViewController?
+
+    @objc func createPollClick(button _: RtkButton) {
+        let controller = RtkCreatePollsViewController(rtkClient: rtkClient) { [weak self] _ in
+            guard let self else { return }
+            creatPollController?.view.removeFromSuperview()
+            creatPollController = nil
         }
-        controller.view.backgroundColor = self.view.backgroundColor
-        self.view.addSubview(controller.view)
-        controller.view.set(.below(topBar), .sameLeadingTrailing(self.view), .bottom(self.view))
-        self.creatPollController = controller
+        controller.view.backgroundColor = view.backgroundColor
+        view.addSubview(controller.view)
+        controller.view.set(.below(topBar), .sameLeadingTrailing(view), .bottom(view))
+        creatPollController = controller
     }
-    
+
     func createShowPollResultView(pollsModel: [PollCardModel]) -> UIView {
         let baseView = UIView()
         var previousView: UIView? = nil
         for (index, model) in pollsModel.enumerated() {
             let view = ShowPolls(leftTitle: model.posterName, rightTitle: model.createdAt, bottomLeftButton: model.leftButton, bottomRightButton: model.rightButton, listSelectionView: ListProgressSelectionView(model: model.poll))
             view.listSelectionView.onSelectView = { [weak self, unowned view] optionIndex in
-                guard let self = self else {return}
-                //Make it untouchable so that user can't select another options.
+                guard let self else { return }
+                // Make it untouchable so that user can't select another options.
                 view.listSelectionView.isUserInteractionEnabled = false
                 view.accessibilityIdentifier = "ListSelectionView_IS_Selected"
-                //TODO: below method should be based on completionHandler
-                self.rtkClient.polls.vote(pollId: model.pollMessage.id, pollOption: model.pollMessage.options[optionIndex])
+                // TODO: below method should be based on completionHandler
+                rtkClient.polls.vote(pollId: model.pollMessage.id, pollOption: model.pollMessage.options[optionIndex])
             }
             baseView.addSubview(view)
             view.clipsToBounds = true
             view.set(.sameLeadingTrailing(baseView))
             if index == 0 {
                 view.set(.top(baseView))
-            }else {
+            } else {
                 view.set(.below(previousView!, spaceToken.space5))
             }
             if index == (pollsModel.count - 1) {
@@ -611,5 +606,4 @@ public class RtkShowPollsViewController: UIViewController , SetTopbar {
         }
         return baseView
     }
-
 }

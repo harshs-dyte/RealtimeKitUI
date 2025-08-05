@@ -8,11 +8,12 @@
 import UIKit
 
 public struct RtkImage {
-    public  var image:UIImage?
+    public var image: UIImage?
     public var url: URL?
     public init(image: UIImage? = nil, url: URL? = nil) {
         self.image = image
         self.url = url
     }
+
     public var renderingMode: UIImage.RenderingMode = .alwaysOriginal
 }
